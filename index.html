@@ -28,7 +28,14 @@
         </ul>
       </header>
       <section>
-        <h1>
+        <p><a href="https://github.com/manodeep/Corrfunc/releases/latest"><img src="https://img.shields.io/github/release/manodeep/Corrfunc.svg" alt="Release"></a>
+<a href="https://raw.githubusercontent.com/manodeep/Corrfunc/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT licensed"></a>
+<a href="https://zenodo.org/badge/latestdoi/19184/manodeep/Corrfunc"><img src="https://zenodo.org/badge/19184/manodeep/Corrfunc.svg" alt="DOI"></a>
+<a href="https://travis-ci.org/manodeep/Corrfunc"><img src="https://travis-ci.org/manodeep/Corrfunc.svg?branch=master" alt="Travis Build"></a>
+<a href="https://github.com/manodeep/Corrfunc/issues"><img src="https://img.shields.io/github/issues/manodeep/Corrfunc.svg" alt="Issues"></a>
+<a href="https://scan.coverity.com/projects/manodeep-corrfunc"><img src="https://img.shields.io/coverity/scan/6982.svg" alt="Coverity"></a></p>
+
+<h1>
 <a id="description" class="anchor" href="#description" aria-hidden="true"><span class="octicon octicon-link"></span></a>Description</h1>
 
 <p>This repo contains a set of codes to measure the following OpenMP parallelized clustering 
@@ -107,7 +114,7 @@ default - code will not compile if the CPU does not support AVX instructions.
 On Linux, check for "avx" in /proc/cpuinfo under flags. If you do not have
 AVX, but have a SSE4 system instead, email me - I will send you a copy of
 the code with SSE4 intrinsics. Or, take the relevant SSE code from the public repo at 
-<a href="https://bitbucket.org/manodeep/pairwise">pairwise</a>.</p></li>
+<a href="https://manodeep.github.io/pairwise">pairwise</a>.</p></li>
 <li><p>USE_OMP -- uses OpenMP parallelization. Scaling is great for DD (perfect scaling
 up to 12 threads in my tests) and okay (runtime becomes constant ~6-8 threads in
 my tests) for DDrppi and wp. </p></li>
@@ -126,8 +133,24 @@ combination of 1/2 for (z)bin_refine_factor might be faster on your platform. </
 <h1>
 <a id="author" class="anchor" href="#author" aria-hidden="true"><span class="octicon octicon-link"></span></a>Author</h1>
 
-<p>Pairwise is written/maintained by Manodeep Sinha. Please contact the <a href="mailto:manodeep@gmail.com">author</a> in
+<p>Corrfunc is written/maintained by Manodeep Sinha. Please contact the <a href="mailto:manodeep@gmail.com">author</a> in
 case of any issues.</p>
+
+<h1>
+<a id="citing" class="anchor" href="#citing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Citing</h1>
+
+<p>If you use the code, please cite using the Zenodo DOI. The BibTex entry for the code is  </p>
+
+<pre><code>@misc{Corrfunc,
+  author       = {Manodeep Sinha},
+  title        = {{Corrfunc: Development release to create zenodo DOI 
+                   Corrfunc: Development release to create zenodo DOI}},
+  month        = nov,
+  year         = 2015,
+  doi          = {10.5281/zenodo.33655},
+  url          = {http://dx.doi.org/10.5281/zenodo.33655}
+}
+</code></pre>
 
 <h1>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>LICENSE</h1>
@@ -139,7 +162,8 @@ with the code including using it in commercial application.</p>
 <a id="project-url" class="anchor" href="#project-url" aria-hidden="true"><span class="octicon octicon-link"></span></a>Project URL</h1>
 
 <ul>
-<li>version control (<a href="https://github.com/manodeep/corrfunc">https://github.com/manodeep/corrfunc</a>)</li>
+<li>website (<a href="https://manodeep.github.io/Corrfunc/">https://manodeep.github.io/Corrfunc/</a>) </li>
+<li>version control (<a href="https://github.com/manodeep/Corrfunc">https://github.com/manodeep/Corrfunc</a>)</li>
 </ul>
       </section>
       <footer>
@@ -147,17 +171,17 @@ with the code including using it in commercial application.</p>
         <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
-    <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-53726906-2', 'auto');
-  ga('send', 'pageview');
-
-</script>
     <script src="javascripts/scale.fix.js"></script>
-    
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-53726906-2");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
   </body>
 </html>
