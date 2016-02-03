@@ -3,7 +3,7 @@
 		This file is a part of the Corrfunc package
 		Copyright (C) 2015-- Manodeep Sinha (manodeep@gmail.com)
 		License: MIT LICENSE. See LICENSE file under the top-level
-		directory at https://bitbucket.org/manodeep/corrfunc/
+		directory at https://github.com/manodeep/Corrfunc/
 */
 
 #include <stdio.h>
@@ -165,7 +165,7 @@ cellarray * gridlink(const int64_t np,
 			nallocated[index] = expected_n;
     }
     assert(lattice[index].nelements < nallocated[index] && "Ensuring that number of particles in a cell doesn't corrupt memory");
-		const int ipos = lattice[index].nelements;
+		const int64_t ipos = lattice[index].nelements;
 		lattice[index].x[ipos] = x[i];
 		lattice[index].y[ipos] = y[i];
 		lattice[index].z[ipos] = z[i];

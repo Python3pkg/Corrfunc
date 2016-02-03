@@ -10,18 +10,46 @@ Requires: numpy
 from __future__ import print_function
 import os
 import sys
+import re
 import numpy as np
-import _countpairs
 import time
 
-tstart=time.time()
-file="../tests/data/gals_Mr19.txt"
-### Make sure the precision agrees with the definition in ../common.mk.
-### Otherwise, you will get a runtime error -- 
-### TypeError TypeError: array cannot be safely cast to required type
-dtype=np.float32
+# Import from current directory first,
+# and then from the package. 
+try: 
+    import _countpairs
+    if sys.version_info[0] >= 3:
+        def rd(filename):
+            with open(filename, encoding="utf-8") as f:
+                r = f.read()
+                
+            return r
+    else:
+        def rd(filename):
+            with open(filename) as f:
+                r = f.read()
 
-### Check if pandas is available - much faster to read in the data through pandas
+            return r
+except ImportError:
+    from Corrfunc import _countpairs, rd
+
+tstart=time.time()
+file = os.path.join(os.path.dirname(os.path.abspath(__file__)),"../tests/data/","gals_Mr19.txt")
+## Figure out the datatype, use the header file in the include directory
+## because that is most likely correct (common.mk might have been modified
+## but not recompiled)
+include_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "../../include/", "countpairs.h")
+includes = rd(include_file)
+vector_type = re.search(r'(\w+)\s*\*\s*rupp\s*\;', includes, re.I).group(1)
+allowed_types = {"float":np.float32,"double":np.float}
+if vector_type not in list(allowed_types.keys()):
+    print("Error: Unknown precision={} found in header file {}. Allowed types are `{}'".format(vector_type,include_file,allowed_types))
+    sys.exit()
+
+dtype = allowed_types[vector_type]
+
+### check if pandas is available - much faster to read in the data through pandas
 t0=time.time()
 print("Reading in the data...")
 try:
@@ -30,7 +58,7 @@ try:
     x = np.asarray(df[0],dtype=dtype)
     y = np.asarray(df[1],dtype=dtype)
     z = np.asarray(df[2],dtype=dtype)
-except:
+except ImportError:
     print("Warning: Could not read in data with pandas -- due to error : {}. Falling back to slower numpy.".format(sys.exc_info()[0]))
     x,y,z = np.genfromtxt(file,dtype=dtype,unpack=True)
 
@@ -40,7 +68,7 @@ print("Done reading the data - time taken = {0:10.1f} seconds.\nBeginning Correl
 boxsize=420.0
 nthreads=4
 pimax=40.0
-binfile="../tests/bins"
+binfile=os.path.join(os.path.dirname(os.path.abspath(__file__)),"../tests/","bins")
 autocorr=1
 numbins_to_print=5
 
@@ -120,6 +148,6 @@ for ibin in range(numbins_to_print):
 print("-----------------------------------------------------------")
 
 tend=time.time()
-print("Done with all functions. Total time taken = {0:10.1f} seconds. Read-in time = {1:10.1f} seconds.".format(tend-tstart,t1-t0))
+print("Done with all THEORY python functions. Total time taken = {0:10.1f} seconds. Read-in time = {1:10.1f} seconds.".format(tend-tstart,t1-t0))
 
 

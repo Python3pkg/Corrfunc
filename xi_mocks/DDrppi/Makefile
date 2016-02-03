@@ -1,4 +1,7 @@
-include ../../mocks.options ../../common.mk
+include ../../mocks.options 
+ifneq (clean,$(findstring clean,$(MAKECMDGOALS)))
+  include ../../common.mk
+endif
 
 target=DDrppi_mocks wprp_mocks
 
@@ -43,14 +46,8 @@ libcountpairs_rp_pi_mocks.a: $(OBJS3) $(INCL) ../../mocks.options ../../common.m
 	cp -p $@ ../../lib/
 	sed -e "s/DOUBLE/$(VECTOR_TYPE)/g" countpairs_rp_pi_mocks.h > ../../include/countpairs_rp_pi_mocks.h
 
-../../lib:
-	mkdir -p ../../lib
-
-../../bin:
-	mkdir -p ../../bin
-
-../../include:
-	mkdir -p ../../include
+../../lib ../../bin ../../include:
+	mkdir -p $@
 
 install: $(target) | ../../bin
 	cp -p $(target) ../../bin/
@@ -61,7 +58,7 @@ tests:
 	$(MAKE) -C ../tests DDrppi
 
 clean:
-	$(RM) $(target) $(OBJS1) $(OBJS2) 
+	$(RM) $(target) $(OBJS1) $(OBJS2)  libcountpairs_rp_pi_mocks.a
 
 clena: clean
 celan: clean

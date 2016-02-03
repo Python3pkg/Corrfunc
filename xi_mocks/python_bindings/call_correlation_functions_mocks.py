@@ -10,16 +10,45 @@ Requires: numpy
 from __future__ import print_function
 import os
 import sys
+import re
 import numpy as np
-import _countpairs_mocks
 import time
 
+
+# Import from current directory first,
+# and then from the package. 
+try: 
+    import _countpairs_mocks
+    if sys.version_info[0] >= 3:
+        def rd(filename):
+            with open(filename, encoding="utf-8") as f:
+                r = f.read()
+                
+            return r
+    else:
+        def rd(filename):
+            with open(filename) as f:
+                r = f.read()
+
+            return r
+except ImportError:
+    from Corrfunc import _countpairs_mocks, rd
+
 tstart=time.time()
-file="../tests/data/Mr19_mock_northonly.rdcz.dat"
-### Make sure the precision agrees with the definition in ../common.mk.
-### Otherwise, you will get a runtime error -- 
-### TypeError TypeError: array cannot be safely cast to required type
-dtype=np.float
+file = os.path.join(os.path.dirname(os.path.abspath(__file__)),"../tests/data/","Mr19_mock_northonly.rdcz.dat")
+## Figure out the datatype, use the header file in the include directory
+## because that is most likely correct (common.mk might have been modified
+## but not recompiled)
+include_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "../../include/", "countpairs_rp_pi_mocks.h")
+includes = rd(include_file)
+vector_type = re.search(r'(\w+)\s*\*\s*rupp\s*\;', includes, re.I).group(1)
+allowed_types = {"float":np.float32,"double":np.float}
+if vector_type not in list(allowed_types.keys()):
+    print("Error: Unknown precision={} found in header file {}. Allowed types are `{}'".format(vector_type,include_file,allowed_types))
+    sys.exit()
+
+dtype = allowed_types[vector_type]
 
 ### Check if pandas is available - much faster to read in the data through pandas
 t0=time.time()
@@ -40,7 +69,7 @@ print("Done reading the data - time taken = {0:10.1f} seconds.\nBeginning Correl
 
 nthreads=4
 pimax=40.0
-binfile="../tests/bins"
+binfile=os.path.join(os.path.dirname(os.path.abspath(__file__)),"../tests/","bins")
 autocorr=1
 numbins_to_print=5
 cosmology=1
@@ -70,9 +99,6 @@ for ibin in range(numbins_to_print):
     print("{0:14.4f} {1:14.4f} {2:14.4f} {3:14d}".format(items[0],items[1],items[2],items[3]))
 print("-----------------------------------------------------------")
 
-print("Done with all MOCK correlation calculations.")
-
-
 print("Beginning the VPF")
 ## Max. sphere radius of 10 Mpc
 rmax=10.0
@@ -82,12 +108,33 @@ num_spheres=10000
 num_pN=6
 threshold_neighbors=1 ## does not matter since we already have the centers
 volume=0.0 ## does not matter since we already have the centers
-centers_file="../tests/data/Mr19_centers_xyz_forVPF_rmax_10Mpc.txt"
+centers_file=os.path.join(os.path.dirname(os.path.abspath(__file__)),"../tests/data/","Mr19_centers_xyz_forVPF_rmax_10Mpc.txt")
 Nran=num_spheres ## set it so that the code runs the loop
 
 results_vpf = _countpairs_mocks.countspheres_vpf_mocks(rmax,nbin,num_spheres,num_pN,threshold_neighbors,centers_file,cosmology,ra,dec,cz,ra,dec,cz)
+print("\n#            ******    pN: first {} bins  *******         ".format(numbins_to_print))
+print('#       r    ',end="")
 
-print("Done with the VPF.")
+for ipn in range(num_pN):
+    print('        p{:0d}      '.format(ipn),end="")
+
+print("")
+
+print("###########",end="")
+for ipn in range(num_pN):
+    print('################',end="")
+print("")
+
+
+for ibin in range(numbins_to_print):
+    items = results_vpf[ibin]
+    print('{0:10.2f} '.format(items[0]),end="")
+    for ipn in range(num_pN):
+        print(' {0:15.4e}'.format(items[ipn+1]),end="")
+    print("")
+
+print("-----------------------------------------------------------")
+
 tend=time.time()
-print("Done with all the MOCK clustering calculations. Total time taken = {:0.2f} seconds.".format(tend-tstart))
+print("Done with all the MOCK python functions. Total time taken = {:0.2f} seconds.".format(tend-tstart))
       

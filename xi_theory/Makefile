@@ -1,20 +1,31 @@
-include ../theory.options ../common.mk
+include ../theory.options 
+ifneq (clean,$(findstring clean,$(MAKECMDGOALS)))
+  include ../common.mk
+endif
 
-target=logbins 
-all: $(target) dirs DD DDrppi wp xi libs examples python_bindings 
+targets:=dirs DD DDrppi wp xi vpf examples 
+
+ifneq ($(COMPILE_PYTHON_EXT), 0)
+targets += python_bindings
+else
+$(warning Not compiling C extensions for theory. Either python or numpy not available)
+endif
+
+all: $(targets) logbins
 
 OBJS1= logbins.o ../utils/utils.o 
-
 logbins: $(OBJS1)  | dirs 
 	$(CC) $(OBJS1)  $(CLINK) -o $@
 
 %.o: %.c 
 	$(CC) $(CFLAGS) -c $< -o $@ 
 
-dirs:
-	mkdir -p ../lib .,/bin ../include 
+dirs:  | ../lib ../bin ../include
 
-.PHONY: clean celna clena celan DD DDrppi libs install wp tests distclean realclean distclena realclena examples dirs xi
+../lib ../bin ../include:
+	mkdir -p $@
+
+.PHONY: clean celna clena celan $(targets) libs install tests distclean realclean distclena realclena
 
 DD:
 	$(MAKE) -C xi_of_r
@@ -28,6 +39,9 @@ wp:
 xi:
 	$(MAKE) -C xi
 
+vpf:
+	$(MAKE) -C vpf
+
 python_bindings: libs
 	$(MAKE) -C python_bindings
 
@@ -36,13 +50,11 @@ examples: libs
 	$(MAKE) -C examples
 
 distclean:realclean
-
 distclena:realclean
-
 realclena:realclean
 
 realclean:
-	$(RM) ../bin/$(target)
+	$(RM) ../bin/logbins
 	$(MAKE) clean
 	$(MAKE) -C xi_of_r distclean
 	$(MAKE) -C xi_rp_pi distclean
@@ -50,9 +62,10 @@ realclean:
 	$(MAKE) -C xi distclean
 	$(MAKE) -C vpf distclean
 	$(MAKE) -C python_bindings distclean
+	$(MAKE) -C tests clean
 
 clean:
-	$(RM) $(target) $(OBJS1) 
+	$(RM) logbins $(OBJS1) 
 	$(MAKE) -C xi_of_r clean
 	$(MAKE) -C xi_rp_pi clean
 	$(MAKE) -C wp clean
@@ -65,8 +78,8 @@ clean:
 clena: clean
 celan: clean
 celna: clean
-install: $(target) | dirs
-	cp -p $(target) ../bin
+install: logbins examples | dirs
+	cp -p logbins ../bin
 	$(MAKE) -C xi_of_r install
 	$(MAKE) -C xi_rp_pi install
 	$(MAKE) -C wp install
@@ -83,13 +96,7 @@ libs: | dirs
 	$(MAKE) -C xi lib
 	$(MAKE) -C vpf lib	
 
-tar: dist
-
-dist:
-	hg archive $(DISTNAME).$(MAJOR).$(MINOR).$(PATCHLEVEL).tar.gz 
-
-tests:
+test: tests
+tests:  
 	$(MAKE) -C tests
-	cd tests && ./test_periodic
-	cd tests && ./test_nonperiodic
 

@@ -3,11 +3,11 @@
 		This file is a part of the Corrfunc package
 		Copyright (C) 2015-- Manodeep Sinha (manodeep@gmail.com)
 		License: MIT LICENSE. See LICENSE file under the top-level
-		directory at https://bitbucket.org/manodeep/corrfunc/
+		directory at https://github.com/manodeep/Corrfunc/
 */
 
-#ifndef __UTILS_H
-#define __UTILS_H
+#pragma once
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdint.h>//defines int64_t datatype -> *exactly* 8 bytes int 
@@ -72,4 +72,3 @@ extern void  setup_bins(const char *fname,double *rmin,double *rmax,int *nbin,do
 }
 #endif
 	
-#endif

@@ -3,11 +3,10 @@
 		This file is a part of the Corrfunc package
 		Copyright (C) 2015-- Manodeep Sinha (manodeep@gmail.com)
 		License: MIT LICENSE. See LICENSE file under the top-level
-		directory at https://bitbucket.org/manodeep/corrfunc/
+		directory at https://github.com/manodeep/Corrfunc/
 */
 
-#ifndef __FTREAD_H
-#define __FTREAD_H
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,4 +22,4 @@ int my_ftread(void *ptr,size_t size,size_t nitems,FILE *stream);
 }
 #endif
 	
-#endif
+

@@ -1,4 +1,7 @@
-include ../../theory.options ../../common.mk
+include ../../theory.options
+ifneq (clean,$(findstring clean,$(MAKECMDGOALS)))
+  include ../../common.mk
+endif
 
 target=xi 
 SRC1   = xi.c countpairs_xi.c ../../utils/gridlink.c ../../utils/utils.c ../../utils/progressbar.c ../../io/ftread.c ../../io/io.c 
@@ -28,14 +31,8 @@ libcountpairs_xi.a: $(OBJS2) ../../common.mk ../../theory.options Makefile | ../
 
 .PHONY: clean clena celan install lib tests distclean
 
-../../lib:
-	mkdir -p ../../lib
-
-../../include:
-	mkdir -p ../../include
-
-../../bin:
-	mkdir -p ../../bin
+../../lib ../../bin ../../include:
+	mkdir -p $@
 
 install: $(target) | ../../bin
 	cp -p $(target) ../../bin/

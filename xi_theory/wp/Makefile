@@ -1,4 +1,7 @@
-include ../../theory.options ../../common.mk
+include ../../theory.options
+ifneq (clean,$(findstring clean,$(MAKECMDGOALS)))
+  include ../../common.mk
+endif
 
 target=wp
 SRC1= wp.c countpairs_wp.c ../../utils/utils.c ../../utils/gridlink.c ../../utils/progressbar.c ../../io/io.c ../../io/ftread.c 
@@ -27,14 +30,8 @@ libcountpairs_wp.a: $(OBJS2) ../../theory.options ../../common.mk Makefile | ../
 
 .PHONY: clean clena celan install lib tests distclean
 
-../../lib:
-	mkdir -p ../../lib
-
-../../bin:
-	mkdir -p ../../bin
-
-../../include:
-	mkdir -p ../../include
+../../lib ../../bin ../../include:
+	mkdir -p $@
 
 install: $(target) | ../../bin
 	cp -p $(target) ../../bin/

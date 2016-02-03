@@ -1,4 +1,8 @@
-include ../../theory.options ../../common.mk
+include ../../theory.options
+ifneq (clean,$(findstring clean,$(MAKECMDGOALS)))
+  include ../../common.mk
+endif
+
 
 target=DD 
 SRC1   = DD.c countpairs.c ../../utils/gridlink.c ../../utils/utils.c ../../utils/progressbar.c ../../io/ftread.c ../../io/io.c 
@@ -24,18 +28,12 @@ lib:  libcountpairs.a | ../../lib
 libcountpairs.a: $(OBJS2) ../../theory.options ../../common.mk Makefile | ../../lib ../../include
 	ar rcs $@ $(OBJS2)
 	cp -p $@ ../../lib/
-	sed -e "s/DOUBLE/$(VECTOR_TYPE)/g" countpairs.h > ../../include/countpairs.h 
+	sed -e "s/DOUBLE/$(VECTOR_TYPE)/g" countpairs.h > ../../include/countpairs.h
 
 .PHONY: clean clena celan install lib tests distclean
 
-../../lib:
-	mkdir -p ../../lib
-
-../../bin:
-	mkdir -p ../../bin
-
-../../include:
-	mkdir -p ../../include
+../../lib ../../bin ../../include:
+	mkdir -p $@
 
 install: $(target) | ../../bin
 	cp -p $(target) ../../bin/

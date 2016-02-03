@@ -3,11 +3,10 @@
 		This file is a part of the Corrfunc package
 		Copyright (C) 2015-- Manodeep Sinha (manodeep@gmail.com)
 		License: MIT LICENSE. See LICENSE file under the top-level
-		directory at https://bitbucket.org/manodeep/corrfunc/
+		directory at https://github.com/manodeep/Corrfunc/
 */
 
-#ifndef _PROGRESSBAR_H_
-#define _PROGRESSBAR_H_
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,5 +26,3 @@ void finish_myprogressbar(int *interrupted);
 }
 #endif
 
-
-#endif

@@ -15,35 +15,38 @@ all: $(PHONY_FIX_PY_LINK) $(LIBRARY) $(SOURCES) $(C_LIBRARY) ../../mocks.options
 
 $(LIBRARY): Makefile ../../mocks.options ../../common.mk $(C_LIBRARY) $(OBJECTS) | ../../lib
 	$(CC) $(OBJECTS) $(C_LIBRARY) $(CLINK) -L$(PYTHON_LIBDIR) $(PYTHON_LINK)  $(GSL_LINK) -shared -o $@
-	rm -f $(PROJECT).so 
+	$(RM) $(PROJECT).so 
 	ln -s $(LIBRARY) $(PROJECT).so
-	cp -p $(LIBRARY) ../../lib/
-	rm -f ../../lib/$(PROJECT).so
-	ln -s $(LIBRARY) ../../lib/$(PROJECT).so
 
 sharedlib: $(LIBRARY) | ../../lib
 	@{ \
 		CURRENT_PYTHON_LIB=`otool -L $(LIBRARY) | grep -i python | cut -d " " -f1 | xargs` ; \
-		PYTHON_LIB_NAME=libpython$(PYTHON_VERSION_MAJOR).$(PYTHON_VERSION_MINOR).dylib ; \
-		install_name_tool -change $$CURRENT_PYTHON_LIB @loader_path/../lib/$$PYTHON_LIB_NAME $(LIBRARY); \
+    PYTHON_LIB_NAME=$(PYTHON_LIB_BASE).dylib ; \
+		LINK_PYTHON_LIB=$(PYTHON_LIBDIR)/$$PYTHON_LIB_NAME ;\
+		if [[ "$$CURRENT_PYTHON_LIB" != "$$LINK_PYTHON_LIB" ]] ; then \
+		install_name_tool -change $$CURRENT_PYTHON_LIB $$LINK_PYTHON_LIB $(LIBRARY); \
+		fi ;\
 	}
 
 ../../lib:
 	mkdir -p ../../lib
 
-../../lib/libcountpairs_rp_pi_mocks.a: 
+../../lib/libcountpairs_rp_pi_mocks.a: ../../mocks.options ../../common.mk Makefile | ../../lib
 	$(MAKE) -C ../DDrppi lib
 
-../../lib/libcountpairs_theta_mocks.a: 
+../../lib/libcountpairs_theta_mocks.a: ../../mocks.options ../../common.mk Makefile | ../../lib
 	$(MAKE) -C ../wtheta lib
 
-../../lib/libcountspheres_mocks.a:
+../../lib/libcountspheres_mocks.a: ../../mocks.options ../../common.mk Makefile | ../../lib
 	$(MAKE) -C ../vpf lib
 
 install: $(PHONY_FIX_PY_LINK) $(LIBRARY) | ../../lib
 	cp -p $(LIBRARY) ../../lib/
 	$(RM) ../../lib/$(PROJECT).so
 	ln -s $(LIBRARY) ../../lib/$(PROJECT).so
+
+tests: $(PHONY_FIX_PY_LINK) $(LIBRARY) ../../theory.options ../../common.mk Makefile $(C_LIBRARY) $(OBJECTS) | ../../lib
+	python call_correlation_functions_mocks.py
 
 %.o: %.c Makefile ../../common.mk $(C_LIBRARY)
 	$(CC) $(OPT) $(CFLAGS) -I../../include $(PYTHON_CFLAGS)  $(INCLUDE) $< -c -o $@

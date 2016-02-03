@@ -1,4 +1,7 @@
-include ../../mocks.options ../../common.mk
+include ../../mocks.options
+ifneq (clean,$(findstring clean,$(MAKECMDGOALS)))
+  include ../../common.mk
+endif
 
 target=vpf_mocks 
 SRC1   = vpf_mocks.c countspheres_mocks.c ../../utils/gridlink_mocks.c ../../utils/utils.c \
@@ -20,7 +23,8 @@ $(target): $(OBJS1) $(INCL) ../../mocks.options ../../common.mk Makefile
 countspheres_mocks.o: countspheres_mocks.c $(INCL) ../../common.mk Makefile
 	$(CC) $(OPT) $(CFLAGS) $(GSL_CFLAGS) $(INCLUDE) -c $< -o $@
 
-
+../../utils/set_cosmo_dist.o:../../utils/set_cosmo_dist.c ../../mocks.options ../../common.mk Makefile
+	$(CC) $(OPT) $(CFLAGS) $(GSL_CFLAGS) $(INCLUDE) -c $< -o $@
 
 libs: lib
 lib:  libcountspheres_mocks.a | ../../lib ../../include
@@ -36,14 +40,8 @@ libcountspheres_mocks.a: $(OBJS2) ../../mocks.options ../../common.mk Makefile |
 
 .PHONY: clean clena celan install lib tests distclean
 
-../../lib:
-	mkdir -p ../../lib
-
-../../include:
-	mkdir -p ../../include
-
-../../bin:
-	mkdir -p ../../bin
+../../lib ../../bin ../../include:
+	mkdir -p $@
 
 install: $(target) | ../../bin
 	cp -p $(target) ../../bin/

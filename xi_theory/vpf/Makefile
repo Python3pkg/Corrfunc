@@ -1,4 +1,7 @@
-include ../../theory.options ../../common.mk
+include ../../theory.options
+ifneq (clean,$(findstring clean,$(MAKECMDGOALS)))
+  include ../../common.mk
+endif
 
 target=vpf 
 SRC1   = vpf.c countspheres.c ../../utils/gridlink.c ../../utils/utils.c ../../utils/progressbar.c ../../io/ftread.c ../../io/io.c 
@@ -30,14 +33,8 @@ libcountspheres.a: $(OBJS2) ../../theory.options ../../common.mk Makefile | ../.
 	cp -p $@ ../../lib/
 	sed -e "s/DOUBLE/$(VECTOR_TYPE)/g" countspheres.h > ../../include/countspheres.h 
 
-../../lib:
-	mkdir -p ../../lib
-
-../../include:
-	mkdir -p ../../include
-
-../../bin:
-	mkdir -p ../../bin
+../../bin ../../include ../../lib:
+	mkdir -p $@
 
 install: $(target) | ../../bin
 	cp -p $(target) ../../bin/
