@@ -36,14 +36,51 @@
 <a href="https://scan.coverity.com/projects/manodeep-corrfunc"><img src="https://img.shields.io/coverity/scan/6982.svg" alt="Coverity"></a></p>
 
 <h1>
-<a id="description" class="anchor" href="#description" aria-hidden="true"><span class="octicon octicon-link"></span></a>Description</h1>
+<a id="description" class="anchor" href="#description" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Description</h1>
 
 <p>This repo contains a set of codes to measure the following OpenMP parallelized clustering 
 measures in a cosmological box (co-moving XYZ) or on a mock (RA, DEC, CZ). Also, 
 contains the associated paper to be published in Astronomy &amp; Computing Journal (at some point). </p>
 
+<h1>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h1>
+
 <h2>
-<a id="clustering-measures-on-a-cosmological-box" class="anchor" href="#clustering-measures-on-a-cosmological-box" aria-hidden="true"><span class="octicon octicon-link"></span></a>Clustering Measures on a Cosmological box</h2>
+<a id="pre-requisites" class="anchor" href="#pre-requisites" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Pre-requisites</h2>
+
+<ol>
+<li>OpenMP capable compiler like <code>icc</code>, <code>gcc</code> or <code>clang &gt;= 3.7</code>. If not available, please disable <code>USE_OMP</code> option option in <code>theory.options</code> and <code>mocks.options</code>. You might need to ask your sys-admin for system-wide installs of the compiler; if you prefer to install your own then <code>conda install gcc</code> (MAC/linux) or <code>(sudo) port install gcc5</code> (on MAC) should work. <em>Note <code>gcc</code> on macports defaults to <code>gcc48</code> and the portfile is currently broken on <code>El Capitan</code></em>.</li>
+<li>
+<code>gsl</code>. Use either <code>conda install -c https://conda.anaconda.org/asmeurer gsl</code> (MAC/linux) or <code>(sudo) port install gsl</code> (MAC) to install <code>gsl</code> if necessary. </li>
+<li>
+<code>python &gt;= 2.6</code> or <code>python&gt;=3.4</code> for compiling the C extensions. </li>
+<li>
+<code>numpy&gt;=1.7</code> for compiling the C extensions. </li>
+</ol>
+
+<p><em>If python and/or numpy are not available, then the C extensions will not be compiled</em>. </p>
+
+<h2>
+<a id="preferred-method" class="anchor" href="#preferred-method" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Preferred Method</h2>
+
+<p><code>git clone https://github.com/manodeep/Corrfunc/</code></p>
+
+<p>Assuming you have <code>gcc</code> in your <code>PATH</code>, <code>make</code> and <code>make install</code> should compile and install the C libraries + python extensions within the source directory. If you would like to install the python C extensions in your environment, then <code>python setup.py install (--user)</code> should be sufficient. </p>
+
+<h2>
+<a id="alternative" class="anchor" href="#alternative" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Alternative</h2>
+
+<p>The python package is directly installable via <code>pip</code>. Unfortunately, the package is too big to upload to <a href="http://pypi.python.org/">PyPI</a>, so the relevant install command is <code>pip install https://github.com/manodeep/Corrfunc/archive/Corrfunc-0.2.0.tar.gz</code>. </p>
+
+<h2>
+<a id="installation-notes" class="anchor" href="#installation-notes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation notes</h2>
+
+<p>If compilation went smoothly, please run <code>make tests</code> to ensure the code is working correctly. Depending on the hardware and compilation options, the tests might take more than a few minutes. <em>Note that the tests are exhaustive and not traditional unit tests</em>. </p>
+
+<p>While I have tried to ensure that the package compiles and runs out of the box, cross-platform compatibility turns out to be incredibly hard. If you run into any issues during compilation and you have all of the pre-requisistes, please see the <a href="FAQ">FAQ</a> or <a href="mailto:manodeep@gmail.com">email me</a>. Also, feel free to create a new issue with the <code>Installation</code> label. </p>
+
+<h2>
+<a id="clustering-measures-on-a-cosmological-box" class="anchor" href="#clustering-measures-on-a-cosmological-box" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Clustering Measures on a Cosmological box</h2>
 
 <p>All codes that work on cosmological boxes with co-moving positions are located in the 
 <code>xi_theory</code> directory. The various clustering measures are:</p>
@@ -57,7 +94,7 @@ contains the associated paper to be published in Astronomy &amp; Computing Journ
 </ol>
 
 <h2>
-<a id="clustering-measures-on-a-mock" class="anchor" href="#clustering-measures-on-a-mock" aria-hidden="true"><span class="octicon octicon-link"></span></a>Clustering measures on a Mock</h2>
+<a id="clustering-measures-on-a-mock" class="anchor" href="#clustering-measures-on-a-mock" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Clustering measures on a Mock</h2>
 
 <p>All codes that work on mock catalogs (RA, DEC, CZ) are located in the <code>xi_mocks</code> directory. The
 various clustering measures are:</p>
@@ -71,73 +108,73 @@ can be combined using <code>wprp</code> to produce the Landy-Szalay estimator fo
 </ol>
 
 <h1>
-<a id="science-options" class="anchor" href="#science-options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Science options</h1>
+<a id="science-options" class="anchor" href="#science-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Science options</h1>
 
 <ol>
-<li><p>PERIODIC (ignored in case of wp/xi) -- switches PERIODIC boundary
+<li><p><code>PERIODIC</code> (ignored in case of wp/xi) -- switches periodic boundary
 conditions on/off. Enabled by default. </p></li>
-<li><p>OUTPUT_RPAVG -- switches on output of <rp> in each <code>rp</code> bin. Can be
+<li><p><code>OUTPUT_RPAVG</code> -- switches on output of <code>&lt;rp&gt;</code> in each <code>rp</code> bin. Can be
 a massive performance hit (~ 2.2x in case of wp). Disabled by default.
-Needs code option DOUBLE_PREC to be enabled as well. For the mocks, 
-OUTPUT_RPAVG causes only a mild increase in runtime and is enabled by 
-default.</rp></p></li>
-<li><p>OUTPUT_THETAAVG -- switches on output of  in each theta bin. 
+Needs code option <code>DOUBLE_PREC</code> to be enabled as well. For the mocks, 
+<code>OUTPUT_RPAVG</code> causes only a mild increase in runtime and is enabled by 
+default.</p></li>
+<li><p><code>OUTPUT_THETAAVG</code> -- switches on output of  in each theta bin. 
 Can be extremely slow (~5x) depending on compiler, and CPU capabilities. 
 Disabled by default. </p></li>
 </ol>
 
 <h2>
-<a id="mocks" class="anchor" href="#mocks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Mocks</h2>
+<a id="mocks" class="anchor" href="#mocks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mocks</h2>
 
 <ol>
-<li><p>LINK_IN_DEC -- creates binning in declination for mocks. Please check that for 
+<li><p><code>LINK_IN_DEC</code> -- creates binning in declination for mocks. Please check that for 
 your desired binning in $r_p$/$\theta$, this binning does not produce incorrect 
 results (due to numerical precision). </p></li>
-<li><p>LINK_IN_RA -- creates binning in RA once binning in DEC has been enabled. Same 
-numerical issues as LINK_IN_DEC</p></li>
-<li><p>FAST_DIVIDE --  Divisions are slow but required $DD(r_p,\pi)$. This Makefile
+<li><p><code>LINK_IN_RA</code> -- creates binning in RA once binning in DEC has been enabled. Same 
+numerical issues as <code>LINK_IN_DEC</code></p></li>
+<li><p><code>FAST_DIVIDE</code> --  Divisions are slow but required $DD(r_p,\pi)$. This Makefile
 option (in mocks.options) replaces the divisions to a reciprocal followed by a 
 Newton-Raphson. The code will run ~20% faster at the expense of some numerical precision. 
 Please check that the loss of precision is not important for your use-case. Also, note 
-that the mocks tests for $DD(r_p, \pi)$<em>will fail</em> if you enable FAST_DIVIDE. </p></li>
+that the mocks tests for $DD(r_p, \pi)$ <em>will fail</em> if you enable <code>FAST_DIVIDE</code>. </p></li>
 </ol>
 
 <h1>
-<a id="common-code-options-for-both-mocks-and-cosmological-boxes" class="anchor" href="#common-code-options-for-both-mocks-and-cosmological-boxes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Common Code options for both Mocks and Cosmological Boxes</h1>
+<a id="common-code-options-for-both-mocks-and-cosmological-boxes" class="anchor" href="#common-code-options-for-both-mocks-and-cosmological-boxes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Common Code options for both Mocks and Cosmological Boxes</h1>
 
 <ol>
-<li><p>DOUBLE_PREC -- does the calculations in double precision. Disabled
+<li><p><code>DOUBLE_PREC</code> -- does the calculations in double precision. Disabled
 by default. </p></li>
-<li><p>USE_AVX -- uses the AVX instruction set found in Intel/AMD CPUs &gt;= 2011
+<li><p><code>USE_AVX</code> -- uses the AVX instruction set found in Intel/AMD CPUs &gt;= 2011
 (Intel: Sandy Bridge or later; AMD: Bulldozer or later). Enabled by
-default - code will not compile if the CPU does not support AVX instructions.
+default - code will run much slower if the CPU does not support AVX instructions.
 On Linux, check for "avx" in /proc/cpuinfo under flags. If you do not have
 AVX, but have a SSE4 system instead, email me - I will send you a copy of
 the code with SSE4 intrinsics. Or, take the relevant SSE code from the public repo at 
 <a href="https://manodeep.github.io/pairwise">pairwise</a>.</p></li>
-<li><p>USE_OMP -- uses OpenMP parallelization. Scaling is great for DD (perfect scaling
+<li><p><code>USE_OMP</code> -- uses OpenMP parallelization. Scaling is great for DD (perfect scaling
 up to 12 threads in my tests) and okay (runtime becomes constant ~6-8 threads in
-my tests) for DDrppi and wp. </p></li>
+my tests) for <code>DDrppi</code> and <code>wp</code>. </p></li>
 </ol>
 
 <p><em>Optimization for your architecture</em></p>
 
 <ol>
-<li><p>The values of bin_refine_factor and/or zbin_refine_factor in the countpairs_*.c
+<li><p>The values of <code>bin_refine_factor</code> and/or <code>zbin_refine_factor</code> in the countpairs_*.c
 files control the cache-misses, and consequently, the runtime. In my trial-and-error
 methods, I have seen any values larger than 3 are always slower. But some different
-combination of 1/2 for (z)bin_refine_factor might be faster on your platform. </p></li>
+combination of 1/2 for <code>(z)bin_refine_factor</code> might be faster on your platform. </p></li>
 <li><p>If you have AVX2/AVX-512/KNC, you will need to rewrite the entire AVX section.</p></li>
 </ol>
 
 <h1>
-<a id="author" class="anchor" href="#author" aria-hidden="true"><span class="octicon octicon-link"></span></a>Author</h1>
+<a id="author" class="anchor" href="#author" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Author</h1>
 
 <p>Corrfunc is written/maintained by Manodeep Sinha. Please contact the <a href="mailto:manodeep@gmail.com">author</a> in
 case of any issues.</p>
 
 <h1>
-<a id="citing" class="anchor" href="#citing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Citing</h1>
+<a id="citing" class="anchor" href="#citing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Citing</h1>
 
 <p>If you use the code, please cite using the Zenodo DOI. The BibTex entry for the code is  </p>
 
@@ -153,13 +190,13 @@ case of any issues.</p>
 </code></pre>
 
 <h1>
-<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>LICENSE</h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>LICENSE</h1>
 
 <p>Corrfunc is released under the MIT license. Basically, do what you want
 with the code including using it in commercial application.</p>
 
 <h1>
-<a id="project-url" class="anchor" href="#project-url" aria-hidden="true"><span class="octicon octicon-link"></span></a>Project URL</h1>
+<a id="project-url" class="anchor" href="#project-url" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project URL</h1>
 
 <ul>
 <li>website (<a href="https://manodeep.github.io/Corrfunc/">https://manodeep.github.io/Corrfunc/</a>) </li>
