@@ -91,8 +91,17 @@ class build_ext_subclass( build_ext ):
                 if exception.errno != errno.EEXIST:
                     raise
 
-            shutil.copyfile('{}.so'.format(os.path.join(ext_dir,ext.name)),self.get_ext_fullpath(ext.name))
+            # full_name='{}.so.{}'.format(os.path.join(ext_dir,ext.name),version)
+            # full_build_name='{}.{}'.format(self.get_ext_fullpath(ext.name),version)
 
+            full_name='{}.so'.format(os.path.join(ext_dir,ext.name))
+            full_build_name='{}'.format(self.get_ext_fullpath(ext.name))
+
+            shutil.copyfile(full_name, full_build_name)
+            shutil.copyfile('{}.so'.format(os.path.join(ext_dir,ext.name)),self.get_ext_fullpath(ext.name))
+            # print("name = {} source = {} dest = {}".format(ext.name, full_name, full_build_name))
+            #command="ln -s {} {}.so".format(full_build_name,self.get_ext_fullpath(ext.name))
+            #os.symlink(full_build_name,self.get_ext_fullpath(ext.name))
 
 
 def generate_extensions(python_dirs):            
@@ -146,10 +155,10 @@ def setup_packages():
     ### Now the lib + associated header files have been generated
     ### and put in lib/ and include/
     ### This step must run after ``make install``
-    dirs_patterns = {'xi_theory/tests/data/':['*.ff','*.txt','*.txt.gz','*.dat'],
-                     'xi_mocks/tests/data':['*.ff','*.txt','*.txt.gz','*.dat'],
-                     'xi_theory/tests':['Mr19*','bins*','cmass*'],
-                     'xi_mocks/tests':['Mr19*','bins*','angular_bins*'],
+    dirs_patterns = {'xi_theory/tests/data': ['*.ff','*.txt','*.txt.gz','*.dat'],
+                     'xi_mocks/tests/data' : ['*.ff','*.txt','*.txt.gz','*.dat'],
+                     'xi_theory/tests'     : ['Mr19*','bins*','cmass*'],
+                     'xi_mocks/tests'      : ['Mr19*','bins*','angular_bins*'],
                      'include':['count*.h'],
                      'lib':['libcount*.a']
                      }
@@ -162,6 +171,13 @@ def setup_packages():
     ### change them to be relative to package dir rather than root
     data_files = ["../{}".format(d) for d in data_files]
 
+    ## Fix long description for PyPI
+    try:
+        import pypandoc
+        long_description = pypandoc.convert('README.md', 'rst')
+    except(IOError, ImportError):
+        long_description = rd('README.md')
+    
     ### All book-keeping is done. 
     base_url = "https://github.com/manodeep/Corrfunc"
     metadata = dict(
@@ -174,7 +190,7 @@ def setup_packages():
         url=base_url,
         download_url='{0}/archive/{1}-{2}.tar.gz'.format(base_url,name,version),
         description='Blazing fast correlation functions on the CPU',
-        long_description=rd('README.md'),
+        long_description=long_description,
         classifiers = [
             'Development Status :: 4 - Beta',
             'Intended Audience :: Developers',
