@@ -63,14 +63,19 @@ contains the associated paper to be published in Astronomy &amp; Computing Journ
 <h2>
 <a id="preferred-method" class="anchor" href="#preferred-method" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Preferred Method</h2>
 
-<p><code>git clone https://github.com/manodeep/Corrfunc/</code></p>
+<pre><code>$ git clone https://github.com/manodeep/Corrfunc/
+$ make 
+$ make install
+$ make tests 
+$ python setup.py install (--user)
+</code></pre>
 
 <p>Assuming you have <code>gcc</code> in your <code>PATH</code>, <code>make</code> and <code>make install</code> should compile and install the C libraries + python extensions within the source directory. If you would like to install the python C extensions in your environment, then <code>python setup.py install (--user)</code> should be sufficient. </p>
 
 <h2>
 <a id="alternative" class="anchor" href="#alternative" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Alternative</h2>
 
-<p>The python package is directly installable via <code>pip</code>. Unfortunately, the package is too big to upload to <a href="http://pypi.python.org/">PyPI</a>, so the relevant install command is <code>pip install https://github.com/manodeep/Corrfunc/archive/Corrfunc-0.2.0.tar.gz</code>. </p>
+<p>The python package is directly installable via <code>pip install Corrfunc</code>. </p>
 
 <h2>
 <a id="installation-notes" class="anchor" href="#installation-notes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation notes</h2>
