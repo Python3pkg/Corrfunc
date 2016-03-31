@@ -3,18 +3,22 @@ ifneq (clean,$(findstring clean,$(MAKECMDGOALS)))
   include ../../common.mk
 endif
 
-target=DDtheta_mocks wtheta
-
 # ifeq (USE_MKL,$(findstring USE_MKL,$(OPT)))
 # MKL_CHECK=mkl
 # endif
 
-INCL   = countpairs_theta_mocks.h ../../io/io.h ../../io/ftread.h ../../io/io.h ../../utils/utils.h ../../utils/gridlink_mocks.h \
+target := DDtheta_mocks wtheta
+SRC1   := DDtheta_mocks.c  countpairs_theta_mocks.c ../../utils/gridlink_mocks.c \
+			../../utils/utils.c ../../io/io.c ../../io/ftread.c
+INCL   := countpairs_theta_mocks.h ../../io/io.h ../../io/ftread.h ../../io/io.h ../../utils/utils.h ../../utils/gridlink_mocks.h \
         ../../utils/function_precision.h ../../utils/cellarray_mocks.h ../../utils/avx_calls.h \
-        ../../utils/defs.h ../../utils/progressbar.h
+        ../../utils/defs.h
 
-SRC1= DDtheta_mocks.c  countpairs_theta_mocks.c ../../utils/gridlink_mocks.c \
-			../../utils/utils.c ../../io/io.c ../../io/ftread.c ../../utils/progressbar.c
+ifeq ($(OUTPUT_PGBAR), 1)
+SRC1 += ../../utils/progressbar.c
+INCL += ../../utils/progressbar.h 
+endif
+
 OBJS1=$(SRC1:.c=.o) 
 
 all: $(target) $(SRC1) $(INCL) ../../mocks.options ../../common.mk Makefile
@@ -35,7 +39,7 @@ wtheta: $(OBJS2) $(INCL) ../../mocks.options ../../common.mk Makefile
 
 # mkl:
 # ifndef MKLROOT
-# 	$(error You have requested MKL but MKLROOT environment variable is not defined)
+# 	$(error $(ccred) You have requested MKL but MKLROOT environment variable is not defined $(ccreset))
 # endif
 
 libs:lib
