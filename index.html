@@ -30,7 +30,7 @@
       <section>
         <p><a href="https://github.com/manodeep/Corrfunc/releases/latest"><img src="https://img.shields.io/github/release/manodeep/Corrfunc.svg" alt="Release"></a>
 <a href="https://raw.githubusercontent.com/manodeep/Corrfunc/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT licensed"></a>
-<a href="https://zenodo.org/badge/latestdoi/19184/manodeep/Corrfunc"><img src="https://zenodo.org/badge/19184/manodeep/Corrfunc.svg" alt="DOI"></a>
+<a href="http://dx.doi.org/10.5281/zenodo.48552"><img src="https://zenodo.org/badge/doi/10.5281/zenodo.48552.svg" alt="DOI"></a>
 <a href="https://travis-ci.org/manodeep/Corrfunc"><img src="https://travis-ci.org/manodeep/Corrfunc.svg?branch=master" alt="Travis Build"></a>
 <a href="https://github.com/manodeep/Corrfunc/issues"><img src="https://img.shields.io/github/issues/manodeep/Corrfunc.svg" alt="Issues"></a>
 <a href="https://scan.coverity.com/projects/manodeep-corrfunc"><img src="https://img.shields.io/coverity/scan/6982.svg" alt="Coverity"></a></p>
@@ -60,14 +60,16 @@ contains the associated paper to be published in Astronomy &amp; Computing Journ
 
 <p><em>If python and/or numpy are not available, then the C extensions will not be compiled</em>. </p>
 
+<p><em>Default compiler on MAC is set to <code>clang</code>, if you want to specify a different compiler, you will have to call <code>make CC=yourcompiler</code></em></p>
+
 <h2>
 <a id="preferred-method" class="anchor" href="#preferred-method" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Preferred Method</h2>
 
 <pre><code>$ git clone https://github.com/manodeep/Corrfunc/
 $ make 
 $ make install
-$ make tests 
 $ python setup.py install (--user)
+$ make tests 
 </code></pre>
 
 <p>Assuming you have <code>gcc</code> in your <code>PATH</code>, <code>make</code> and <code>make install</code> should compile and install the C libraries + python extensions within the source directory. If you would like to install the python C extensions in your environment, then <code>python setup.py install (--user)</code> should be sufficient. </p>
@@ -145,6 +147,26 @@ that the mocks tests for $DD(r_p, \pi)$ <em>will fail</em> if you enable <code>F
 </ol>
 
 <h1>
+<a id="running-the-codes" class="anchor" href="#running-the-codes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running the codes</h1>
+
+<p>The documentation is lacking currently but I am actively working on it. </p>
+
+<h2>
+<a id="using-the-command-line-interface" class="anchor" href="#using-the-command-line-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using the command-line interface</h2>
+
+<p>Navigate to the correct directory. Make sure that the options, set in either <code>theory.options</code> or <code>mocks.options</code> in the root directory are what you want. If not, edit those two files (and possibly <code>common.mk</code>), and recompile. Then, you can use the command-line executables in each individual subdirectory corresponding to the clustering measure you are interested in. For example, if you want to compute the full 3-D correlation function, <code>\xi(r)</code>, then navigate to <code>xi_theory/xi</code> and run the executable <code>xi</code>. If you run executables without any arguments, the message will you tell you all the required arguments. </p>
+
+<h2>
+<a id="calling-from-c" class="anchor" href="#calling-from-c" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Calling from C</h2>
+
+<p>Look under the <code>xi_theory/examples/run_correlations.c</code> and <code>xi_mocks/examples/run_correlations_mocks.c</code> to see examples of calling the C API directly. If you run the executables, <code>run_correlations</code> and <code>run_correlations_mocks</code>, the output will also show how to call the command-line interface for the various clustering measures. </p>
+
+<h2>
+<a id="calling-from-python" class="anchor" href="#calling-from-python" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Calling from Python</h2>
+
+<p>If all went well, the codes can be directly called from <code>python</code>. Please see <code>Corrfunc/call_correlation_functions.py</code> and <code>Corrfunc/call_correlation_functions_mocks.py</code> for examples on how to use the Python interface. </p>
+
+<h1>
 <a id="common-code-options-for-both-mocks-and-cosmological-boxes" class="anchor" href="#common-code-options-for-both-mocks-and-cosmological-boxes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Common Code options for both Mocks and Cosmological Boxes</h1>
 
 <ol>
@@ -183,16 +205,21 @@ case of any issues.</p>
 
 <p>If you use the code, please cite using the Zenodo DOI. The BibTex entry for the code is  </p>
 
-<pre><code>@misc{Corrfunc,
+<pre><code>@misc{manodeep_sinha_2016_48552,
   author       = {Manodeep Sinha},
-  title        = {{Corrfunc: Development release to create zenodo DOI 
-                   Corrfunc: Development release to create zenodo DOI}},
-  month        = nov,
-  year         = 2015,
-  doi          = {10.5281/zenodo.33655},
-  url          = {http://dx.doi.org/10.5281/zenodo.33655}
+  title        = {Corrfunc: Corrfunc-0.2.3},
+  month        = mar,
+  year         = 2016,
+  doi          = {10.5281/zenodo.48552},
+  url          = {http://dx.doi.org/10.5281/zenodo.48552}
 }
 </code></pre>
+
+<h1>
+<a id="mailing-list" class="anchor" href="#mailing-list" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mailing list</h1>
+
+<p>If you have questions or comments about the package, please do so on the mailing list:
+<a href="https://groups.google.com/forum/#!forum/corrfunc">https://groups.google.com/forum/#!forum/corrfunc</a></p>
 
 <h1>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>LICENSE</h1>
