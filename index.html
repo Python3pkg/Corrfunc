@@ -28,19 +28,29 @@
         </ul>
       </header>
       <section>
-        <p><a href="https://github.com/manodeep/Corrfunc/releases/latest"><img src="https://img.shields.io/github/release/manodeep/Corrfunc.svg" alt="Release"></a>
-<a href="https://raw.githubusercontent.com/manodeep/Corrfunc/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT licensed"></a>
-<a href="http://dx.doi.org/10.5281/zenodo.48552"><img src="https://zenodo.org/badge/doi/10.5281/zenodo.48552.svg" alt="DOI"></a>
-<a href="https://travis-ci.org/manodeep/Corrfunc"><img src="https://travis-ci.org/manodeep/Corrfunc.svg?branch=master" alt="Travis Build"></a>
-<a href="https://github.com/manodeep/Corrfunc/issues"><img src="https://img.shields.io/github/issues/manodeep/Corrfunc.svg" alt="Issues"></a>
-<a href="https://scan.coverity.com/projects/manodeep-corrfunc"><img src="https://img.shields.io/coverity/scan/6982.svg" alt="Coverity"></a></p>
+        <p>|Release| |MIT licensed| |DOI| |Travis Build| |Issues| |Coverity|</p>
 
 <h1>
 <a id="description" class="anchor" href="#description" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Description</h1>
 
-<p>This repo contains a set of codes to measure the following OpenMP parallelized clustering 
-measures in a cosmological box (co-moving XYZ) or on a mock (RA, DEC, CZ). Also, 
-contains the associated paper to be published in Astronomy &amp; Computing Journal (at some point). </p>
+<p>This repo contains a set of codes to measure the following OpenMP
+parallelized clustering measures in a cosmological box (co-moving XYZ)
+or on a mock (RA, DEC, CZ). Also, contains the associated paper to be
+published in Astronomy &amp; Computing Journal (at some point).</p>
+
+<h1>
+<a id="why-should-you-use-it" class="anchor" href="#why-should-you-use-it" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why Should You Use it</h1>
+
+<ol>
+<li>
+<strong>Fast</strong> All theory pair-counting is at least an order of magnitude faster than all existing public codes. Particularly suited for MCMC. </li>
+<li>
+<strong>Python Extensions</strong> Python extensions allow you to do the compute-heavy bits using C while retaining all of the user-friendliness of python. </li>
+<li>
+<strong>Modular</strong> The code is written in a modular fashion and is easily extensible to compute arbitrary clustering statistics. </li>
+<li>
+<strong>Future-proof</strong> As I get access to newer instruction-sets, the codes will get updated to use the latest and greatest CPU features. </li>
+</ol>
 
 <h1>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h1>
@@ -49,21 +59,36 @@ contains the associated paper to be published in Astronomy &amp; Computing Journ
 <a id="pre-requisites" class="anchor" href="#pre-requisites" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Pre-requisites</h2>
 
 <ol>
-<li>OpenMP capable compiler like <code>icc</code>, <code>gcc</code> or <code>clang &gt;= 3.7</code>. If not available, please disable <code>USE_OMP</code> option option in <code>theory.options</code> and <code>mocks.options</code>. You might need to ask your sys-admin for system-wide installs of the compiler; if you prefer to install your own then <code>conda install gcc</code> (MAC/linux) or <code>(sudo) port install gcc5</code> (on MAC) should work. <em>Note <code>gcc</code> on macports defaults to <code>gcc48</code> and the portfile is currently broken on <code>El Capitan</code></em>.</li>
+<li><code>make &gt;= 3.80</code></li>
+<li>OpenMP capable compiler like <code>icc</code>, <code>gcc</code> or <code>clang &gt;= 3.7</code>. If
+not available, please disable <code>USE_OMP</code> option option in
+<code>theory.options</code> and <code>mocks.options</code>. You might need to ask your
+sys-admin for system-wide installs of the compiler; if you prefer to
+install your own then <code>conda install gcc</code> (MAC/linux) or
+<code>(sudo) port install gcc5</code> (on MAC) should work. <em>Note <code>gcc</code> on
+macports defaults to <code>gcc48</code> and the portfile is currently broken
+on <code>El Capitan</code></em>.</li>
 <li>
-<code>gsl</code>. Use either <code>conda install -c https://conda.anaconda.org/asmeurer gsl</code> (MAC/linux) or <code>(sudo) port install gsl</code> (MAC) to install <code>gsl</code> if necessary. </li>
+<code>gsl</code>. Use either
+<code>conda install -c https://conda.anaconda.org/asmeurer gsl</code>
+(MAC/linux) or <code>(sudo) port install gsl</code> (MAC) to install <code>gsl</code>
+if necessary.</li>
 <li>
-<code>python &gt;= 2.6</code> or <code>python&gt;=3.4</code> for compiling the C extensions. </li>
+<code>python &gt;= 2.6</code> or <code>python&gt;=3.4</code> for compiling the C extensions.</li>
 <li>
-<code>numpy&gt;=1.7</code> for compiling the C extensions. </li>
+<code>numpy&gt;=1.7</code> for compiling the C extensions.</li>
 </ol>
 
-<p><em>If python and/or numpy are not available, then the C extensions will not be compiled</em>. </p>
+<p><em>If python and/or numpy are not available, then the C extensions will
+not be compiled</em>.</p>
 
-<p><em>Default compiler on MAC is set to <code>clang</code>, if you want to specify a different compiler, you will have to call <code>make CC=yourcompiler</code></em></p>
+<p><em>Default compiler on MAC is set to <code>clang</code>, if you want to specify a
+different compiler, you will have to call <code>make CC=yourcompiler</code></em></p>
 
 <h2>
 <a id="preferred-method" class="anchor" href="#preferred-method" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Preferred Method</h2>
+
+<p>::</p>
 
 <pre><code>$ git clone https://github.com/manodeep/Corrfunc/
 $ make 
@@ -72,46 +97,65 @@ $ python setup.py install (--user)
 $ make tests 
 </code></pre>
 
-<p>Assuming you have <code>gcc</code> in your <code>PATH</code>, <code>make</code> and <code>make install</code> should compile and install the C libraries + python extensions within the source directory. If you would like to install the python C extensions in your environment, then <code>python setup.py install (--user)</code> should be sufficient. </p>
+<p>Assuming you have <code>gcc</code> in your <code>PATH</code>, <code>make</code> and
+<code>make install</code> should compile and install the C libraries + python
+extensions within the source directory. If you would like to install the
+python C extensions in your environment, then
+<code>python setup.py install (--user)</code> should be sufficient.</p>
 
 <h2>
 <a id="alternative" class="anchor" href="#alternative" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Alternative</h2>
 
-<p>The python package is directly installable via <code>pip install Corrfunc</code>. </p>
+<p>The python package is directly installable via <code>pip install Corrfunc</code>. However, in that case you will lose the ability to recompile the code according to your needs. Not recommended unless you are desperate (i.e., <code>email me &lt;mailto:manodeep@gmail.com&gt;</code>__ if you are having install issues). </p>
 
 <h2>
 <a id="installation-notes" class="anchor" href="#installation-notes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation notes</h2>
 
-<p>If compilation went smoothly, please run <code>make tests</code> to ensure the code is working correctly. Depending on the hardware and compilation options, the tests might take more than a few minutes. <em>Note that the tests are exhaustive and not traditional unit tests</em>. </p>
+<p>If compilation went smoothly, please run <code>make tests</code> to ensure the
+code is working correctly. Depending on the hardware and compilation
+options, the tests might take more than a few minutes. <em>Note that the
+tests are exhaustive and not traditional unit tests</em>.</p>
 
-<p>While I have tried to ensure that the package compiles and runs out of the box, cross-platform compatibility turns out to be incredibly hard. If you run into any issues during compilation and you have all of the pre-requisistes, please see the <a href="FAQ">FAQ</a> or <a href="mailto:manodeep@gmail.com">email me</a>. Also, feel free to create a new issue with the <code>Installation</code> label. </p>
+<p>While I have tried to ensure that the package compiles and runs out of
+the box, cross-platform compatibility turns out to be incredibly hard.
+If you run into any issues during compilation and you have all of the
+pre-requisites, please see the <code>FAQ &lt;FAQ&gt;</code>__ or <code>email
+me &lt;mailto:manodeep@gmail.com&gt;</code>__. Also, feel free to create a new issue
+with the <code>Installation</code> label.</p>
 
 <h2>
 <a id="clustering-measures-on-a-cosmological-box" class="anchor" href="#clustering-measures-on-a-cosmological-box" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Clustering Measures on a Cosmological box</h2>
 
-<p>All codes that work on cosmological boxes with co-moving positions are located in the 
-<code>xi_theory</code> directory. The various clustering measures are:</p>
+<p>All codes that work on cosmological boxes with co-moving positions are
+located in the <code>xi_theory</code> directory. The various clustering measures
+are:</p>
 
 <ol>
-<li><p><code>xi_of_r</code> -- Measures auto/cross-correlations between two boxes. The boxes do not need to be cubes.</p></li>
-<li><p><code>xi</code> -- Measures 3-d auto-correlation in a cubic cosmological box. Assumes PERIODIC boundary conditions.</p></li>
-<li><p><code>wp</code> -- Measures auto 2-d point projected correlation function in a cubic cosmological box. Assumes PERIODIC boundary conditions. </p></li>
-<li><p><code>xi_rp_pi</code> -- Measures the auto/cross correlation function between two boxes. The boxes do not need to be cubes. </p></li>
-<li><p><code>vpf</code> -- Measures the void probability function + counts-in-cells. </p></li>
+<li><p><code>xi_of_r</code> -- Measures auto/cross-correlations between two boxes.
+The boxes do not need to be cubes.</p></li>
+<li><p><code>xi</code> -- Measures 3-d auto-correlation in a cubic cosmological box.
+Assumes PERIODIC boundary conditions.</p></li>
+<li><p><code>wp</code> -- Measures auto 2-d point projected correlation function in a
+cubic cosmological box. Assumes PERIODIC boundary conditions.</p></li>
+<li><p><code>xi_rp_pi</code> -- Measures the auto/cross correlation function between
+two boxes. The boxes do not need to be cubes.</p></li>
+<li><p><code>vpf</code> -- Measures the void probability function + counts-in-cells.</p></li>
 </ol>
 
 <h2>
 <a id="clustering-measures-on-a-mock" class="anchor" href="#clustering-measures-on-a-mock" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Clustering measures on a Mock</h2>
 
-<p>All codes that work on mock catalogs (RA, DEC, CZ) are located in the <code>xi_mocks</code> directory. The
-various clustering measures are:</p>
+<p>All codes that work on mock catalogs (RA, DEC, CZ) are located in the
+<code>xi_mocks</code> directory. The various clustering measures are:</p>
 
 <ol>
-<li><p><code>DDrppi</code> -- The standard auto/cross correlation between two data sets. The outputs, DD, DR and RR
-can be combined using <code>wprp</code> to produce the Landy-Szalay estimator for $w_p(r_p)$. </p></li>
-<li><p><code>wtheta</code> -- Computes angular correlation function between two data sets. The outputs from 
-<code>DDtheta_mocks</code> need to be combined with <code>wtheta</code> to get the full $\omega(\theta)$</p></li>
-<li><p><code>vpf</code> -- Computes the void probability function on mocks. </p></li>
+<li><p><code>DDrppi</code> -- The standard auto/cross correlation between two data
+sets. The outputs, DD, DR and RR can be combined using <code>wprp</code> to
+produce the Landy-Szalay estimator for <code>wp(rp)</code>.</p></li>
+<li><p><code>wtheta</code> -- Computes angular correlation function between two data
+sets. The outputs from <code>DDtheta_mocks</code> need to be combined with
+<code>wtheta</code> to get the full <code>\omega(\theta)</code></p></li>
+<li><p><code>vpf</code> -- Computes the void probability function on mocks.</p></li>
 </ol>
 
 <h1>
@@ -119,107 +163,182 @@ can be combined using <code>wprp</code> to produce the Landy-Szalay estimator fo
 
 <ol>
 <li><p><code>PERIODIC</code> (ignored in case of wp/xi) -- switches periodic boundary
-conditions on/off. Enabled by default. </p></li>
-<li><p><code>OUTPUT_RPAVG</code> -- switches on output of <code>&lt;rp&gt;</code> in each <code>rp</code> bin. Can be
-a massive performance hit (~ 2.2x in case of wp). Disabled by default.
-Needs code option <code>DOUBLE_PREC</code> to be enabled as well. For the mocks, 
-<code>OUTPUT_RPAVG</code> causes only a mild increase in runtime and is enabled by 
-default.</p></li>
-<li><p><code>OUTPUT_THETAAVG</code> -- switches on output of  in each theta bin. 
-Can be extremely slow (~5x) depending on compiler, and CPU capabilities. 
-Disabled by default. </p></li>
+conditions on/off. Enabled by default.</p></li>
+<li><p><code>OUTPUT_RPAVG</code> -- switches on output of <code>&lt;rp&gt;</code> in each <code>rp</code>
+bin. Can be a massive performance hit (~ 2.2x in case of wp).
+Disabled by default. Needs code option <code>DOUBLE_PREC</code> to be enabled
+as well. For the mocks, <code>OUTPUT_RPAVG</code> causes only a mild increase
+in runtime and is enabled by default.</p></li>
+<li><p><code>OUTPUT_THETAAVG</code> -- switches on output of in each theta bin. Can
+be extremely slow (~5x) depending on compiler, and CPU capabilities.
+Disabled by default.</p></li>
 </ol>
 
 <h2>
 <a id="mocks" class="anchor" href="#mocks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mocks</h2>
 
 <ol>
-<li><p><code>LINK_IN_DEC</code> -- creates binning in declination for mocks. Please check that for 
-your desired binning in $r_p$/$\theta$, this binning does not produce incorrect 
-results (due to numerical precision). </p></li>
-<li><p><code>LINK_IN_RA</code> -- creates binning in RA once binning in DEC has been enabled. Same 
-numerical issues as <code>LINK_IN_DEC</code></p></li>
-<li><p><code>FAST_DIVIDE</code> --  Divisions are slow but required $DD(r_p,\pi)$. This Makefile
-option (in mocks.options) replaces the divisions to a reciprocal followed by a 
-Newton-Raphson. The code will run ~20% faster at the expense of some numerical precision. 
-Please check that the loss of precision is not important for your use-case. Also, note 
-that the mocks tests for $DD(r_p, \pi)$ <em>will fail</em> if you enable <code>FAST_DIVIDE</code>. </p></li>
+<li><p><code>LINK_IN_DEC</code> -- creates binning in declination for mocks. Please
+check that for your desired binning in <code>r_p</code> or <code>\theta</code>,
+this binning does not produce incorrect results (due to numerical
+precision).</p></li>
+<li><p><code>LINK_IN_RA</code> -- creates binning in RA once binning in DEC has been
+enabled. Same numerical issues as <code>LINK_IN_DEC</code></p></li>
+<li><p><code>FAST_DIVIDE</code> -- Divisions are slow but required
+<code>DD(r_p,\pi)</code>. This <code>Makefile</code> option (in <code>mocks.options</code>) replaces
+the divisions to a reciprocal followed by a Newton-Raphson. The code
+will run ~20% faster at the expense of some numerical precision.
+Please check that the loss of precision is not important for your
+use-case. Also, note that the mocks tests for <code>DD(r_p, \pi)</code>
+<em>will fail</em> if you enable <code>FAST_DIVIDE</code>.</p></li>
 </ol>
 
 <h1>
 <a id="running-the-codes" class="anchor" href="#running-the-codes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running the codes</h1>
 
-<p>The documentation is lacking currently but I am actively working on it. </p>
+<p>The documentation is lacking currently but I am actively working on it.</p>
 
 <h2>
 <a id="using-the-command-line-interface" class="anchor" href="#using-the-command-line-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using the command-line interface</h2>
 
-<p>Navigate to the correct directory. Make sure that the options, set in either <code>theory.options</code> or <code>mocks.options</code> in the root directory are what you want. If not, edit those two files (and possibly <code>common.mk</code>), and recompile. Then, you can use the command-line executables in each individual subdirectory corresponding to the clustering measure you are interested in. For example, if you want to compute the full 3-D correlation function, <code>\xi(r)</code>, then navigate to <code>xi_theory/xi</code> and run the executable <code>xi</code>. If you run executables without any arguments, the message will you tell you all the required arguments. </p>
+<p>Navigate to the correct directory. Make sure that the options, set in
+either <code>theory.options</code> or <code>mocks.options</code> in the root directory are
+what you want. If not, edit those two files (and possibly
+<code>common.mk</code>), and recompile. Then, you can use the command-line
+executables in each individual subdirectory corresponding to the
+clustering measure you are interested in. For example, if you want to
+compute the full 3-D correlation function, <code>\xi(r)</code>, then navigate to
+<code>xi_theory/xi</code> and run the executable <code>xi</code>. If you run executables
+without any arguments, the message will you tell you all the required
+arguments.</p>
 
 <h2>
 <a id="calling-from-c" class="anchor" href="#calling-from-c" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Calling from C</h2>
 
-<p>Look under the <code>xi_theory/examples/run_correlations.c</code> and <code>xi_mocks/examples/run_correlations_mocks.c</code> to see examples of calling the C API directly. If you run the executables, <code>run_correlations</code> and <code>run_correlations_mocks</code>, the output will also show how to call the command-line interface for the various clustering measures. </p>
+<p>Look under the <code>xi_theory/examples/run_correlations.c</code> and
+<code>xi_mocks/examples/run_correlations_mocks.c</code> to see examples of
+calling the C API directly. If you run the executables,
+<code>run_correlations</code> and <code>run_correlations_mocks</code>, the output will
+also show how to call the command-line interface for the various
+clustering measures.</p>
 
 <h2>
 <a id="calling-from-python" class="anchor" href="#calling-from-python" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Calling from Python</h2>
 
-<p>If all went well, the codes can be directly called from <code>python</code>. Please see <code>Corrfunc/call_correlation_functions.py</code> and <code>Corrfunc/call_correlation_functions_mocks.py</code> for examples on how to use the Python interface. </p>
+<p>If all went well, the codes can be directly called from <code>python</code>.
+Please see <code>Corrfunc/call_correlation_functions.py</code> and
+<code>Corrfunc/call_correlation_functions_mocks.py</code> for examples on how to
+use the Python interface. Here are a few examples:</p>
+
+<p>.. code:: python</p>
+
+<pre><code>from __future__ import print_function
+import os.path as path
+import numpy as np
+import Corrfunc
+from Corrfunc._countpairs import countpairs_wp as wp
+
+# Setup the problem for wp
+boxsize = 500.0
+pimax = 40.0
+nthreads = 4
+
+# Create a fake data-set.
+Npts = 100000
+x = np.float32(np.random.random(Npts))
+y = np.float32(np.random.random(Npts))
+z = np.float32(np.random.random(Npts))
+x *= boxsize
+y *= boxsize
+z *= boxsize
+
+# Use a file with histogram bins, containing Nbins pairs of (rmin rmax)
+binfile = path.join(path.dirname(path.abspath(Corrfunc.__file__)), "../xi_theory/tests/", "bins")
+
+# Call wp
+wp_results = wp(boxsize, pimax, nthreads, binfile, x, y, z)
+
+# Print the results
+print("###########################################")
+print("##   rmin       rmax        wp       npairs")
+print("###########################################")
+for wp in wp_results:
+    print("{0:10.4f} {1:10.4f} {2:12.6f} {3:8d}"
+          .format(wp[0], wp[1], wp[3], wp[4]))
+</code></pre>
+
+<h1>
+<a id="benchmark-against-existing-codes" class="anchor" href="#benchmark-against-existing-codes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Benchmark against Existing Codes</h1>
+
+<p>Please see this
+<code>gist &lt;https://gist.github.com/manodeep/cffd9a5d77510e43ccf0&gt;</code>__ for
+some benchmarks with current codes.</p>
 
 <h1>
 <a id="common-code-options-for-both-mocks-and-cosmological-boxes" class="anchor" href="#common-code-options-for-both-mocks-and-cosmological-boxes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Common Code options for both Mocks and Cosmological Boxes</h1>
 
 <ol>
-<li><p><code>DOUBLE_PREC</code> -- does the calculations in double precision. Disabled
-by default. </p></li>
-<li><p><code>USE_AVX</code> -- uses the AVX instruction set found in Intel/AMD CPUs &gt;= 2011
-(Intel: Sandy Bridge or later; AMD: Bulldozer or later). Enabled by
-default - code will run much slower if the CPU does not support AVX instructions.
-On Linux, check for "avx" in /proc/cpuinfo under flags. If you do not have
-AVX, but have a SSE4 system instead, email me - I will send you a copy of
-the code with SSE4 intrinsics. Or, take the relevant SSE code from the public repo at 
-<a href="https://manodeep.github.io/pairwise">pairwise</a>.</p></li>
-<li><p><code>USE_OMP</code> -- uses OpenMP parallelization. Scaling is great for DD (perfect scaling
-up to 12 threads in my tests) and okay (runtime becomes constant ~6-8 threads in
-my tests) for <code>DDrppi</code> and <code>wp</code>. </p></li>
+<li><p><code>DOUBLE_PREC</code> -- does the calculations in double precision.
+Disabled by default.</p></li>
+<li>
+<p><code>USE_AVX</code> -- uses the AVX instruction set found in Intel/AMD CPUs</p>
+
+<blockquote>
+<p>= 2011 (Intel: Sandy Bridge or later; AMD: Bulldozer or later).
+Enabled by default - code will run much slower if the CPU does not
+support AVX instructions. The <code>Makefile</code> will automatically check
+for "AVX" support and disable this option for unsupported CPUs. </p>
+</blockquote>
+</li>
+<li><p><code>USE_OMP</code> -- uses OpenMP parallelization. Scaling is great for DD
+(perfect scaling up to 12 threads in my tests) and okay (runtime
+becomes constant ~6-8 threads in my tests) for <code>DDrppi</code> and <code>wp</code>.
+Enabled by default. The <code>Makefile</code> will compare the <code>CC</code> variable with
+known OpenMP enabled compilers and set compile options accordingly. </p></li>
 </ol>
 
 <p><em>Optimization for your architecture</em></p>
 
 <ol>
-<li><p>The values of <code>bin_refine_factor</code> and/or <code>zbin_refine_factor</code> in the countpairs_*.c
-files control the cache-misses, and consequently, the runtime. In my trial-and-error
-methods, I have seen any values larger than 3 are always slower. But some different
-combination of 1/2 for <code>(z)bin_refine_factor</code> might be faster on your platform. </p></li>
-<li><p>If you have AVX2/AVX-512/KNC, you will need to rewrite the entire AVX section.</p></li>
+<li><p>The values of <code>bin_refine_factor</code> and/or <code>zbin_refine_factor</code> in
+the <code>countpairs\_\*.c</code> files control the cache-misses, and
+consequently, the runtime. In my trial-and-error methods, I have seen
+any values larger than 3 are always slower. But some different
+combination of 1/2 for <code>(z)bin_refine_factor</code> might be faster on
+your platform.</p></li>
+<li><p>If you have AVX2/AVX-512/KNC, you will need to add a new kernel within
+the <code>*_kernels.c</code> and edit the runtime dispatch code to call this new
+kernel. </p></li>
 </ol>
 
 <h1>
 <a id="author" class="anchor" href="#author" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Author</h1>
 
-<p>Corrfunc is written/maintained by Manodeep Sinha. Please contact the <a href="mailto:manodeep@gmail.com">author</a> in
-case of any issues.</p>
+<p>Corrfunc is written/maintained by Manodeep Sinha. Please contact the
+<code>author &lt;mailto:manodeep@gmail.com&gt;</code>__ in case of any issues.</p>
 
 <h1>
 <a id="citing" class="anchor" href="#citing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Citing</h1>
 
-<p>If you use the code, please cite using the Zenodo DOI. The BibTex entry for the code is  </p>
+<p>If you use the code, please cite using the Zenodo DOI. The BibTex entry
+for the code is</p>
 
-<pre><code>@misc{manodeep_sinha_2016_48552,
-  author       = {Manodeep Sinha},
-  title        = {Corrfunc: Corrfunc-0.2.3},
-  month        = mar,
-  year         = 2016,
-  doi          = {10.5281/zenodo.48552},
-  url          = {http://dx.doi.org/10.5281/zenodo.48552}
-}
-</code></pre>
+<p>::</p>
+
+<p><a href="https://github.com/misc" class="user-mention">@misc</a>{manodeep_sinha_2016_55161,
+       author       = {Manodeep Sinha},
+       title        = {Corrfunc: Corrfunc-1.1.0},
+       month        = jun,
+       year         = 2016,
+       doi          = {10.5281/zenodo.55161},
+       url          = {<a href="http://dx.doi.org/10.5281/zenodo.55161">http://dx.doi.org/10.5281/zenodo.55161</a>}
+   }</p>
 
 <h1>
 <a id="mailing-list" class="anchor" href="#mailing-list" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mailing list</h1>
 
-<p>If you have questions or comments about the package, please do so on the mailing list:
-<a href="https://groups.google.com/forum/#!forum/corrfunc">https://groups.google.com/forum/#!forum/corrfunc</a></p>
+<p>If you have questions or comments about the package, please do so on the
+mailing list: <a href="https://groups.google.com/forum/#!forum/corrfunc">https://groups.google.com/forum/#!forum/corrfunc</a></p>
 
 <h1>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>LICENSE</h1>
@@ -231,9 +350,22 @@ with the code including using it in commercial application.</p>
 <a id="project-url" class="anchor" href="#project-url" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project URL</h1>
 
 <ul>
-<li>website (<a href="https://manodeep.github.io/Corrfunc/">https://manodeep.github.io/Corrfunc/</a>) </li>
-<li>version control (<a href="https://github.com/manodeep/Corrfunc">https://github.com/manodeep/Corrfunc</a>)</li>
+<li> website (<a href="https://manodeep.github.io/Corrfunc/">https://manodeep.github.io/Corrfunc/</a>)</li>
+<li> version control (<a href="https://github.com/manodeep/Corrfunc">https://github.com/manodeep/Corrfunc</a>)</li>
 </ul>
+
+<p>.. |Release| image:: <a href="https://img.shields.io/github/release/manodeep/Corrfunc.svg">https://img.shields.io/github/release/manodeep/Corrfunc.svg</a>
+   :target: <a href="https://github.com/manodeep/Corrfunc/releases/latest">https://github.com/manodeep/Corrfunc/releases/latest</a>
+.. |MIT licensed| image:: <a href="https://img.shields.io/badge/license-MIT-blue.svg">https://img.shields.io/badge/license-MIT-blue.svg</a>
+   :target: <a href="https://raw.githubusercontent.com/manodeep/Corrfunc/master/LICENSE">https://raw.githubusercontent.com/manodeep/Corrfunc/master/LICENSE</a>
+.. |DOI| image:: <a href="https://zenodo.org/badge/19184/manodeep/Corrfunc.svg">https://zenodo.org/badge/19184/manodeep/Corrfunc.svg</a>
+   :target: <a href="https://zenodo.org/badge/latestdoi/19184/manodeep/Corrfunc">https://zenodo.org/badge/latestdoi/19184/manodeep/Corrfunc</a>
+.. |Travis Build| image:: <a href="https://travis-ci.org/manodeep/Corrfunc.svg?branch=master">https://travis-ci.org/manodeep/Corrfunc.svg?branch=master</a>
+   :target: <a href="https://travis-ci.org/manodeep/Corrfunc">https://travis-ci.org/manodeep/Corrfunc</a>
+.. |Issues| image:: <a href="https://img.shields.io/github/issues/manodeep/Corrfunc.svg">https://img.shields.io/github/issues/manodeep/Corrfunc.svg</a>
+   :target: <a href="https://github.com/manodeep/Corrfunc/issues">https://github.com/manodeep/Corrfunc/issues</a>
+.. |Coverity| image:: <a href="https://img.shields.io/coverity/scan/6982.svg">https://img.shields.io/coverity/scan/6982.svg</a>
+   :target: <a href="https://scan.coverity.com/projects/manodeep-corrfunc">https://scan.coverity.com/projects/manodeep-corrfunc</a></p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/manodeep">manodeep</a></p>
