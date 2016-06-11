@@ -1,7 +1,4 @@
-include ../../theory.options
-ifneq (clean,$(findstring clean,$(MAKECMDGOALS)))
-  include ../../common.mk
-endif
+include ../../theory.options ../../common.mk
 
 target := vpf 
 SRC1   := vpf.c countspheres.c ../../utils/gridlink.c ../../utils/utils.c ../../io/ftread.c ../../io/io.c 
@@ -44,8 +41,10 @@ libcountspheres.a: $(OBJS2) $(INCL) ../../theory.options ../../common.mk Makefil
 ../../bin ../../include ../../lib:
 	mkdir -p $@
 
-install: $(target) | ../../bin
-	cp -p $(target) ../../bin/
+install: ../../bin/$(target) | ../../bin
+
+../../bin/$(target): $(target)
+	cp -p $< $@
 
 distclean: clean | ../../lib ../../include ../../bin
 	$(RM) ../../lib/libcountspheres.a

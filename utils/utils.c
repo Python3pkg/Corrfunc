@@ -253,16 +253,13 @@ void print_time(struct timeval t0,struct timeval t1,const char *s)
 void* my_realloc(void *x,size_t size,int64_t N,const char *varname)
 {
     void *tmp = realloc(x,N*size);
-    size_t gigabytes = N*size/(1024.0*1024.0*1024.0);
 
     if (tmp==NULL) {
         fprintf(stderr,"ERROR: Could not reallocate for %"PRId64" elements with %zu size for variable `%s' ..aborting\n",N,size,varname);
         my_free((void **) &x);
         exit(EXIT_FAILURE);
-    } else {
-        if(gigabytes > 1)
-            fprintf(stderr,"\n Successfully re-allocated  %"PRId64" elements with total size %zu (GB) for variable `%s' \n",N, gigabytes,varname);
     }
+
     return tmp;
 
 }
@@ -271,16 +268,12 @@ void* my_malloc(size_t size,int64_t N)
 {
     void *x = NULL;
     x = malloc(N*size);
-    size_t megabytes = N*size/(1024.0*1024.0);
     if (x==NULL){
         fprintf(stderr,"malloc for %"PRId64" elements with %zu bytes failed..aborting\n",N,size);
         exit(EXIT_FAILURE);
-    } else {
-        if(megabytes > 100)
-            fprintf(stderr,"\n Successfully allocated  %"PRId64" elements with total size %zu (MB) \n",N, megabytes);
     }
+        
     return x;
-
 }
 
 
@@ -429,7 +422,7 @@ int test_all_files_present(const int nfiles, ...)
     int absent=0;
     va_list filenames;
     va_start(filenames, nfiles);
-    assert(nfiles <= 31 && "Can only test for 31 files simultaneously");
+    XASSERT(nfiles <= 31, "Can only test for 31 files simultaneously. nfiles = %d \n",nfiles);
     for(int i=0;i<nfiles;i++) {
         const char *f = va_arg(filenames, const char *);
         FILE *fp = fopen(f,"r");

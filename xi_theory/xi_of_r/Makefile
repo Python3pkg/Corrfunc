@@ -1,14 +1,11 @@
-include ../../theory.options
-ifneq (clean,$(findstring clean,$(MAKECMDGOALS)))
-  include ../../common.mk
-endif
-
+include ../../theory.options ../../common.mk
+#OPT+=-DSILENT
 
 target := DD 
-SRC1   := DD.c countpairs.c ../../utils/gridlink.c ../../utils/utils.c ../../io/ftread.c ../../io/io.c 
+SRC1   := DD.c countpairs.c countpairs_driver.c ../../utils/gridlink.c ../../utils/utils.c ../../io/ftread.c ../../io/io.c 
 INCL   := countpairs.h ../../io/ftread.h ../../io/io.h ../../utils/utils.h ../../utils/gridlink.h \
 		../../utils/function_precision.h ../../utils/cellarray.h ../../utils/avx_calls.h \
-		../../utils/defs.h 
+		../../utils/defs.h countpairs_kernels.c
 
 ifeq ($(OUTPUT_PGBAR), 1)
 SRC1 += ../../utils/progressbar.c
@@ -24,19 +21,20 @@ $(target): $(OBJS1) $(INCL) ../../theory.options ../../common.mk Makefile
 %.o: %.c $(INCL) ../../theory.options ../../common.mk Makefile
 	$(CC) $(OPT) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
-SRC2   = countpairs.c ../../utils/gridlink.c ../../utils/utils.c
+SRC2   = countpairs.c countpairs_driver.c ../../utils/gridlink.c ../../utils/utils.c
 ifeq ($(OUTPUT_PGBAR), 1)
 SRC2 += ../../utils/progressbar.c
 endif
 
 OBJS2  = $(SRC2:.c=.o)
-
 libs: lib
-lib:  libcountpairs.a | ../../lib
+lib:  ../../lib/libcountpairs.a | ../../lib
 
 libcountpairs.a: $(OBJS2) $(INCL) ../../theory.options ../../common.mk Makefile | ../../lib ../../include
 	ar rcs $@ $(OBJS2)
-	cp -p $@ ../../lib/
+
+../../lib/libcountpairs.a: libcountpairs.a
+	cp -p $< $@
 	sed -e "s/DOUBLE/$(VECTOR_TYPE)/g" countpairs.h > ../../include/countpairs.h
 
 .PHONY: clean clena celan install lib tests distclean
@@ -44,8 +42,10 @@ libcountpairs.a: $(OBJS2) $(INCL) ../../theory.options ../../common.mk Makefile 
 ../../lib ../../bin ../../include:
 	mkdir -p $@
 
-install: $(target) | ../../bin
-	cp -p $(target) ../../bin/
+install: ../../bin/$(target) | ../../bin
+
+../../bin/$(target): $(target)
+	cp -p $< $@
 
 distclean: clean | ../../lib ../../include ../../bin
 	$(RM) ../../lib/libcountpairs.a ../../include/countpairs.h
@@ -58,12 +58,7 @@ clena: clean
 celan: clean
 
 
-tests: ../tests/tests_periodic ../tests/tests_nonperiodic 
-	$(MAKE) -C ../tests	xi_of_r
+tests: 
+	$(MAKE) -C ../tests xi_of_r
 
-../tests/tests_periodic:
-	$(MAKE) -C ../tests
-
-../tests/tests_nonperiodic:
-	$(MAKE) -C ../tests
 

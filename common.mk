@@ -9,19 +9,10 @@ CLINK:=
 
 ### You should NOT edit below this line
 DISTNAME:=Corrfunc
-MAJOR:=0
-MINOR:=2
-PATCHLEVEL:=3
+MAJOR:=1
+MINOR:=1
+PATCHLEVEL:=0
 VERSION:=$(MAJOR).$(MINOR).$(PATCHLEVEL)
-
-## Colored text output
-## Taken from: http://stackoverflow.com/questions/24144440/color-highlighting-of-makefile-warnings-and-errors
-ccreset:=$(shell echo "\033[0;0m")
-ccred:=$(shell echo "\033[0;31m")
-ccmagenta:=$(shell echo "\033[0;35m")
-ccgreen:=$(shell echo "\033[0;32m")
-ccblue:=$(shell echo "\033[0;34m")
-## end of colored text output
 
 DO_CHECKS := 1
 ifeq (clean,$(findstring clean,$(MAKECMDGOALS)))
@@ -32,16 +23,84 @@ ifeq (distclean,$(findstring distclean,$(MAKECMDGOALS)))
   DO_CHECKS := 0
 endif
 
+ifeq (realclean,$(findstring realclean,$(MAKECMDGOALS)))
+  DO_CHECKS := 0
+endif
+
 ## Only set everything if the command is not "make clean"
 ifeq ($(DO_CHECKS), 1)
-  ## Make clang the default compiler on Mac
+  ## First check make version. Versions of make older than 3.80 will crash
+  ifneq (3.80,$(firstword $(sort $(MAKE_VERSION) 3.80)))
+    ## Order-only attributes were added to make version 3.80
+    $(warning $(ccmagenta)Please upgrade $(ccblue)make$(ccreset))
+    ifeq ($(UNAME), Darwin)
+      $(info $(ccmagenta)on Mac+homebrew, use $(ccgreen)"brew outdated xctool || brew upgrade xctool"$(ccreset))
+      $(info $(ccmagenta)Otherwise, install $(ccblue)XCode command-line tools$(ccmagenta) directly: $(ccgreen)"xcode-select --install"$(ccreset))
+      $(info $(ccmagenta)This link: $(ccgreen)"http://railsapps.github.io/xcode-command-line-tools.html"$(ccmagenta) has some more details$(ccreset))
+    else
+      $(info $(ccmagenta)On Linux: Try some variant of $(ccgreen)"sudo apt-get update && sudo apt-get upgrade"(ccreset))
+    endif
+    $(error $(ccmagenta)Project requires make >= 3.80 to compile.$(ccreset))
+  endif
+  #end of checks for make. 
+
+
   UNAME := $(shell uname)
+  ## Colored text output
+  ## Taken from: http://stackoverflow.com/questions/24144440/color-highlighting-of-makefile-warnings-and-errors
+  ## Except, you have to use "echo -e" on linux and "echo" on Mac
+  ECHO_COMMAND := echo -e
   ifeq ($(UNAME), Darwin)
-    CC := clang
+    ECHO_COMMAND := echo
+  endif
+  ccreset :=$(shell $(ECHO_COMMAND) "\033[0;0m")
+  ccred:=$(shell $(ECHO_COMMAND) "\033[0;31m")
+  ccmagenta:=$(shell $(ECHO_COMMAND) "\033[0;35m")
+  ccgreen:=$(shell $(ECHO_COMMAND) "\033[0;32m")
+  ccblue:=$(shell $(ECHO_COMMAND) "\033[0;34m")
+  ## end of colored text output
+
+
+  ## Make clang the default compiler on Mac
+  ## But first check for clang-omp, use that if available
+  ifeq ($(UNAME), Darwin)
+    CLANG_OMP_FOUND := $(shell clang-omp --version 2>/dev/null)
+    ifndef CLANG_OMP_FOUND
+      CC := clang
+    else
+      CC := clang-omp
+    endif
+  endif
+  # Check if CPU supports AVX -> this trumps everything. For instance, compiler might
+  # support AVX but the cpu might not. Then compilation will work fine but there will
+  # be a runtime crash with "Illegal Instruction"
+  ifeq ($(UNAME), Darwin)
+    # On a MAC, best to use sysctl
+    AVX_AVAIL := $(shell sysctl -n machdep.cpu.features 2>/dev/null | grep -o -i AVX | tr '[:lower:]' '[:upper:]')
+  else
+    # On Linux/Unix, just grep on /proc/cpuinfo
+    # There might be multiple cores, so just take the first line
+    # (Is it possible that someone has one core that has AVX and another that doesnt?)
+    AVX_AVAIL := $(shell grep -o -i AVX /proc/cpuinfo 2>/dev/null | head -n 1 | tr '[:lower:]' '[:upper:]' )
+  endif
+  REMOVE_AVX :=0
+  ifdef AVX_AVAIL
+    ifneq ($(AVX_AVAIL) , AVX)
+      REMOVE_AVX := 1
+    endif
+  else
+    REMOVE_AVX :=1
   endif
 
+  ifeq ($(REMOVE_AVX), 1)
+    $(warning $(ccmagenta) CPU does not seem support AVX instructions. Removing USE_AVX from compile options. $(ccreset))
+    OPT:=$(filter-out -DUSE_AVX,$(OPT))
+  endif
+  # end of checking if CPU supports AVX      
+
+
   # Now check if gcc is set to be the compiler but if clang is really under the hood.
-	export CC_IS_CLANG ?= -1
+  export CC_IS_CLANG ?= -1
   ifeq ($(CC_IS_CLANG), -1)
     CC_VERSION := $(shell $(CC) --version 2>/dev/null)
     ifndef CC_VERSION
@@ -78,15 +137,6 @@ ifeq ($(DO_CHECKS), 1)
   GSL_CFLAGS := $(shell gsl-config --cflags)
   GSL_LIBDIR := $(shell gsl-config --prefix)/lib
   GSL_LINK   := $(shell gsl-config --libs) -Xlinker -rpath -Xlinker $(GSL_LIBDIR)
-
-  # Check if code is running on travis
-  ifeq (osx, $(findstring osx, ${TRAVIS_OS_NAME}))
-    ifeq (USE_AVX, $(findstring USE_AVX,$(OPT)))
-      $(warning $(ccmagenta) TRAVIS CI OSX workers do not seem to support AVX instructions. Removing USE_AVX from compile options. $(ccreset))
-      OPT:=$(filter-out -DUSE_AVX,$(OPT))
-  endif
-  endif
-  # done with removing USE_AVX under osx on Travis
 
   # Check if all progressbar output is to be suppressed
   OUTPUT_PGBAR := 1
@@ -157,7 +207,7 @@ ifeq ($(DO_CHECKS), 1)
 	        ifeq ($(CLANG_ASM_WARNING_PRINTED), 0)
             $(warning $(ccmagenta) WARNING: gcc on Mac does not support intrinsics. Attempting to use the clang assembler $(ccreset))
             $(warning $(ccmagenta) If you see the error message $(ccred) "/opt/local/bin/as: assembler (/opt/local/bin/clang) not installed" $(ccmagenta) then try the following fix $(ccreset))
-            $(warning $(ccmagenta) Either install clang ($(ccgreen)for macports use, "sudo port install clang-3.8"$(ccmagenta)) or remove option $(ccgreen)"USE_AVX"$(ccmagenta) from both the $(ccgreen)"theory.options"$(ccmagenta) and $(ccgreen)"mocks.options"$(ccmagenta) files$(ccreset))
+            $(warning $(ccmagenta) Either install clang ($(ccgreen)for Macports use, "sudo port install clang-3.8"$(ccmagenta)) or remove option $(ccgreen)"USE_AVX"$(ccmagenta) from both the $(ccgreen)"theory.options"$(ccmagenta) and $(ccgreen)"mocks.options"$(ccmagenta) files$(ccreset))
             export CLANG_ASM_WARNING_PRINTED := 1
           endif # warning printed
         endif
@@ -168,18 +218,23 @@ ifeq ($(DO_CHECKS), 1)
         endif #openmp with gcc
       endif #gcc findstring
     else ##CC is clang
-	    ### compiler specific flags for clang
+      ### compiler specific flags for clang
       CLANG_OMP_AVAIL := false
-      CFLAGS += -funroll-loops
       export APPLE_CLANG := 0
       ifeq (USE_OMP,$(findstring USE_OMP,$(OPT)))
         ifeq (clang-omp,$(findstring clang-omp,$(CC)))
           CLANG_OMP_AVAIL:=true
+          CFLAGS += -fopenmp
+          CLINK  += -liomp5
         else
           # Apple clang/gcc does not support OpenMP
           ifeq (Apple, $(findstring Apple, $(CC_VERSION)))
             CLANG_OMP_AVAIL:= false
-	          export APPLE_CLANG := 1
+            $(warning $(ccmagenta)Compiler is Apple clang and does not support OpenMP$(ccreset))
+            $(info $(ccmagenta)If you want OpenMP support, please install clang with OpenMP support$(ccreset))
+            $(info $(ccmagenta)For homebrew, use $(ccgreen)"brew update && (brew outdated xctool || brew upgrade xctool) && brew tap homebrew/versions && brew install clang-omp"$(ccreset))
+            $(info $(ccmagenta)For Macports, use $(ccgreen)"sudo port install clang-3.8 +assertions +debug + openmp"$(ccreset))
+            export APPLE_CLANG := 1
           else
             ## Need to do a version check clang >= 3.7 supports OpenMP. If it is Apple clang, then it doesn't support OpenMP.
             ## All of the version checks go here. If OpenMP is supported, update CLANG_OMP_AVAIL to 1.
@@ -191,19 +246,18 @@ ifeq ($(DO_CHECKS), 1)
             CLANG_MINOR_MIN_OPENMP := 7
             CLANG_OMP_AVAIL := $(shell [ $(CLANG_VERSION_MAJOR) -gt $(CLANG_MAJOR_MIN_OPENMP) -o \( $(CLANG_VERSION_MAJOR) -eq $(CLANG_MAJOR_MIN_OPENMP) -a $(CLANG_VERSION_MINOR) -ge $(CLANG_MINOR_MIN_OPENMP) \) ] && echo true)
             CLANG_IS_38 := $(shell [ $(CLANG_VERSION_MAJOR) -eq 3 -a $(CLANG_VERSION_MINOR) -eq 8  ] && echo true)
+            CFLAGS += -fopenmp=libomp
+            CLINK  += -fopenmp=libomp
           endif #Apple check
-	      endif  #clang-omp check
+        endif  #clang-omp check
 
         ifeq ($(CLANG_OMP_AVAIL),true)
           ifeq ($(APPLE_CLANG),0)
-            CFLAGS += -fopenmp=libomp
-            CLINK  += -fopenmp=libomp
             ifeq ($(UNAME), Darwin)
-
+              $(info $(ccmagenta)Enabling OpenMP with clang.$(ccreset))
               CLANG_LD_ERROR := "dyld: Library not loaded: @rpath/libLLVM.dylib\nReferenced from: /opt/local/libexec/llvm-3.8/lib/libLTO.dylib\nReason: image not found\n"
               export CLANG_LD_WARNING_PRINTED ?= 0
               ifeq ($(CLANG_LD_WARNING_PRINTED), 0)
-                $(info $(ccmagenta)Enabling OpenMP with clang.$(ccreset))
                 ifeq ($(CLANG_IS_38), true)
                   $(warning With $(ccgreen)clang-3.8$(ccreset), You might see this $(ccred)$(CLANG_LD_ERROR)$(ccmagenta) error with the final linking step.$(ccreset))
                   $(info $(ccmagenta)Use the following to fix the issue $(ccgreen) "sudo install_name_tool -change @executable_path/../lib/libLTO.dylib @rpath/../lib/libLTO.dylib /opt/local/libexec/ld64/ld-latest"$(ccreset))
@@ -235,9 +289,10 @@ ifeq ($(DO_CHECKS), 1)
       CFLAGS  +=  -mavx -mpopcnt
     endif
 
-    CFLAGS  += -march=native -fno-strict-aliasing
-    CFLAGS  += -Wformat=2  -Wpacked  -Wnested-externs -Wpointer-arith  -Wredundant-decls  -Wfloat-equal -Wcast-qual
-    CFLAGS  +=  -Wcast-align -Wmissing-declarations -Wmissing-prototypes  -Wnested-externs -Wstrict-prototypes  #-D_POSIX_C_SOURCE=2 -Wpadded -Wconversion
+    CFLAGS += -funroll-loops
+    CFLAGS += -march=native -fno-strict-aliasing
+    CFLAGS += -Wformat=2  -Wpacked  -Wnested-externs -Wpointer-arith  -Wredundant-decls  -Wfloat-equal -Wcast-qual
+    CFLAGS +=  -Wcast-align -Wmissing-declarations -Wmissing-prototypes  -Wnested-externs -Wstrict-prototypes  #-D_POSIX_C_SOURCE=2 -Wpadded -Wconversion
     CLINK += -lm 
   endif #not icc
 
@@ -252,7 +307,7 @@ ifeq ($(DO_CHECKS), 1)
 
     ## I only need this so that I can print out the full python version (correctly)
     ## in case of error
-	  PYTHON_VERSION_PATCH := $(word 3,${PYTHON_VERSION_FULL})
+    PYTHON_VERSION_PATCH := $(word 3,${PYTHON_VERSION_FULL})
 
     ## Check numpy version
     export NUMPY_VERSION_FULL :=  $(wordlist 1,3,$(subst ., ,$(shell python -c "from __future__ import print_function; import numpy; print(numpy.__version__)")))
@@ -304,13 +359,14 @@ ifeq ($(DO_CHECKS), 1)
       PYTHON_LINK := $(filter-out -framework, $(PYTHON_LINK))
       PYTHON_LINK := $(filter-out -ldl, $(PYTHON_LINK))
       PYTHON_LINK := $(filter-out CoreFoundation, $(PYTHON_LINK))
-      PYTHON_LINK += -dynamiclib -Wl,-compatibility_version,$(VERSION) -Wl,-current_version,$(VERSION)
+      PYTHON_LINK += -dynamiclib -Wl,-compatibility_version,$(MAJOR).$(MINOR) -Wl,-current_version,$(VERSION)
+      PYTHON_LINK += -headerpad_max_install_names
 
       ### Another check for stack-size. travis ci chokes on this with gcc
       # comma := ,
       # PYTHON_LINK := $(filter-out -Wl$(comma)-stack_size$(comma)1000000$(comma), $(PYTHON_LINK))
       # PYTHON_LINK := $(filter-out -Wl$(comma)-stack_size$(comma)1000000$(comma), $(PYTHON_LINK))
-	    # PYTHON_LINK := $(filter-out -stack_size$(comma)1000000$(comma), $(PYTHON_LINK))
+      # PYTHON_LINK := $(filter-out -stack_size$(comma)1000000$(comma), $(PYTHON_LINK))
     endif #Darwin checks
     export PYTHON_CHECKED:=1
   endif

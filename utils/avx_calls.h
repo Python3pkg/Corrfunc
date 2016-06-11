@@ -36,6 +36,7 @@ extern "C" {
 
 #ifndef DOUBLE_PREC
 
+#define AVX_NVEC                         8    
 #define AVX_INTS                         __m256i
 #define AVX_FLOATS                       __m256
 
@@ -92,7 +93,7 @@ extern "C" {
 #define AVX_STREAMING_STORE_INTS(X,Y)     _mm256_stream_si256(X,Y)
 
 #else //DOUBLE PRECISION CALCULATIONS
-
+#define AVX_NVEC                         4    
 #define AVX_INTS                         __m128i
 #define AVX_FLOATS                       __m256d
 #define AVX_LOAD_FLOATS_UNALIGNED(X)     _mm256_loadu_pd(X)
@@ -152,7 +153,7 @@ extern "C" {
     {
         union cos{
             AVX_FLOATS m;
-            DOUBLE x[NVEC];
+            DOUBLE x[AVX_NVEC];
         };
         union cos union_costheta;
         union cos union_returnvalue;
@@ -161,7 +162,7 @@ extern "C" {
         const DOUBLE one = (DOUBLE) 1.0;
         const DOUBLE zero = (DOUBLE) 0.0;
 
-        for(int ii=0;ii<NVEC;ii++) {
+        for(int ii=0;ii<AVX_NVEC;ii++) {
             const DOUBLE costheta = union_costheta.x[ii];
             if(costheta < minus_one) {
                 union_returnvalue.x[ii] = M_PI;
