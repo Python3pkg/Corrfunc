@@ -1,4 +1,4 @@
-|Release| |MIT licensed| |DOI| |Travis Build| |Issues| |Coverity|
+|Release| |MIT licensed| |DOI| |Travis Build| |Issues| |Coverity| |RTD|
 
 Description
 ===========
@@ -6,7 +6,8 @@ Description
 This repo contains a set of codes to measure the following OpenMP
 parallelized clustering measures in a cosmological box (co-moving XYZ)
 or on a mock (RA, DEC, CZ). Also, contains the associated paper to be
-published in Astronomy & Computing Journal (at some point).
+published in Astronomy & Computing Journal (at some point). Read the
+documentation on `corrfunc.rtfd.io <http://corrfunc.rtfd.io/>`_.
 
 Why Should You Use it
 ======================
@@ -163,7 +164,8 @@ Mocks
 Running the codes
 =================
 
-The documentation is lacking currently but I am actively working on it.
+Read the documentation on `corrfunc.rtfd.io <http://corrfunc.rtfd.io/>`_.
+
 
 Using the command-line interface
 --------------------------------
@@ -304,17 +306,27 @@ Project URL
 ===========
 
 -  website (https://manodeep.github.io/Corrfunc/)
+-  documentation (http://corrfunc.rtfd.io/)   
 -  version control (https://github.com/manodeep/Corrfunc)
 
 .. |Release| image:: https://img.shields.io/github/release/manodeep/Corrfunc.svg
    :target: https://github.com/manodeep/Corrfunc/releases/latest
+   :alt: Latest Release
 .. |MIT licensed| image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/manodeep/Corrfunc/master/LICENSE
+   :alt: MIT License
 .. |DOI| image:: https://zenodo.org/badge/19184/manodeep/Corrfunc.svg
    :target: https://zenodo.org/badge/latestdoi/19184/manodeep/Corrfunc
+   :alt: Zenodo DOI
 .. |Travis Build| image:: https://travis-ci.org/manodeep/Corrfunc.svg?branch=master
    :target: https://travis-ci.org/manodeep/Corrfunc
+   :alt: Build Status
 .. |Issues| image:: https://img.shields.io/github/issues/manodeep/Corrfunc.svg
    :target: https://github.com/manodeep/Corrfunc/issues
+   :alt: Open Issues
 .. |Coverity| image:: https://img.shields.io/coverity/scan/6982.svg
    :target: https://scan.coverity.com/projects/manodeep-corrfunc
+   :alt: Code Health
+.. |RTD| image:: https://readthedocs.org/projects/corrfunc/badge/?version=master
+   :target: http://corrfunc.readthedocs.io/en/master/?badge=master
+   :alt: Documentation Status
