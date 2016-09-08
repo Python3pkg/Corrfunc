@@ -28,7 +28,7 @@
         </ul>
       </header>
       <section>
-        <p>|Release| |MIT licensed| |DOI| |Travis Build| |Issues| |Coverity|</p>
+        <p>|Release| |MIT licensed| |DOI| |Travis Build| |Issues| |Coverity| |RTD|</p>
 
 <h1>
 <a id="description" class="anchor" href="#description" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Description</h1>
@@ -36,14 +36,15 @@
 <p>This repo contains a set of codes to measure the following OpenMP
 parallelized clustering measures in a cosmological box (co-moving XYZ)
 or on a mock (RA, DEC, CZ). Also, contains the associated paper to be
-published in Astronomy &amp; Computing Journal (at some point).</p>
+published in Astronomy &amp; Computing Journal (at some point). Read the
+documentation on <code>corrfunc.rtfd.io &lt;http://corrfunc.rtfd.io/&gt;</code>_.</p>
 
 <h1>
 <a id="why-should-you-use-it" class="anchor" href="#why-should-you-use-it" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why Should You Use it</h1>
 
 <ol>
 <li>
-<strong>Fast</strong> All theory pair-counting is at least an order of magnitude faster than all existing public codes. Particularly suited for MCMC. </li>
+<strong>Fast</strong> All theory pair-counting is at least <strong>2x</strong> faster than all existing public codes. Particularly suited for MCMC. </li>
 <li>
 <strong>Python Extensions</strong> Python extensions allow you to do the compute-heavy bits using C while retaining all of the user-friendliness of python. </li>
 <li>
@@ -51,6 +52,13 @@ published in Astronomy &amp; Computing Journal (at some point).</p>
 <li>
 <strong>Future-proof</strong> As I get access to newer instruction-sets, the codes will get updated to use the latest and greatest CPU features. </li>
 </ol>
+
+<h1>
+<a id="benchmark-against-existing-codes" class="anchor" href="#benchmark-against-existing-codes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Benchmark against Existing Codes</h1>
+
+<p>Please see this
+<code>gist &lt;https://gist.github.com/manodeep/cffd9a5d77510e43ccf0&gt;</code>__ for
+some benchmarks with current codes. If you have a pair-counter that you would like to compare, please add in a corresponding function and update the timings. </p>
 
 <h1>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h1>
@@ -80,10 +88,10 @@ if necessary.</li>
 </ol>
 
 <p><em>If python and/or numpy are not available, then the C extensions will
-not be compiled</em>.</p>
+not be compiled.</em></p>
 
-<p><em>Default compiler on MAC is set to <code>clang</code>, if you want to specify a
-different compiler, you will have to call <code>make CC=yourcompiler</code></em></p>
+<p><em>Default compiler on MAC is set to</em> <code>clang</code>, <em>if you want to specify a
+different compiler, you will have to call</em> <code>make CC=yourcompiler</code></p>
 
 <h2>
 <a id="preferred-method" class="anchor" href="#preferred-method" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Preferred Method</h2>
@@ -101,7 +109,9 @@ $ make tests
 <code>make install</code> should compile and install the C libraries + python
 extensions within the source directory. If you would like to install the
 python C extensions in your environment, then
-<code>python setup.py install (--user)</code> should be sufficient.</p>
+<code>python setup.py install (--user)</code> should be sufficient. If you are primarily
+interested in the <code>python</code> interface, you can condense all of the steps
+by using <code>python setup.py install CC=yourcompiler (--user)</code> after <code>git clone</code>.</p>
 
 <h2>
 <a id="alternative" class="anchor" href="#alternative" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Alternative</h2>
@@ -161,42 +171,76 @@ sets. The outputs from <code>DDtheta_mocks</code> need to be combined with
 <h1>
 <a id="science-options" class="anchor" href="#science-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Science options</h1>
 
+<p>If you plan to use the command-line, then you will have to specify the
+code runtime options at compile-time. For theory routines, these options
+are in the file <code>theory.options</code> while for the mocks, these options are
+in file <code>mocks.options</code>. </p>
+
+<p><strong>Note</strong> All options can be specified at 
+runtime if you use the python interface or the static libraries. Each one of
+the following <code>Makefile</code> option has a corresponding entry for the runtime
+libraries. </p>
+
+<h2>
+<a id="theory-in-theoryoptions" class="anchor" href="#theory-in-theoryoptions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Theory (in <code>theory.options</code>)</h2>
+
 <ol>
 <li><p><code>PERIODIC</code> (ignored in case of wp/xi) -- switches periodic boundary
 conditions on/off. Enabled by default.</p></li>
 <li><p><code>OUTPUT_RPAVG</code> -- switches on output of <code>&lt;rp&gt;</code> in each <code>rp</code>
 bin. Can be a massive performance hit (~ 2.2x in case of wp).
-Disabled by default. Needs code option <code>DOUBLE_PREC</code> to be enabled
-as well. For the mocks, <code>OUTPUT_RPAVG</code> causes only a mild increase
-in runtime and is enabled by default.</p></li>
-<li><p><code>OUTPUT_THETAAVG</code> -- switches on output of in each theta bin. Can
-be extremely slow (~5x) depending on compiler, and CPU capabilities.
-Disabled by default.</p></li>
+Disabled by default. </p></li>
+<li><p><code>DOUBLE_PREC</code> -- switches on calculations in double precision. Disabled
+by default (i.e., calculations are performed in single precision by default).</p></li>
 </ol>
 
 <h2>
-<a id="mocks" class="anchor" href="#mocks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mocks</h2>
+<a id="mocks-in-mocksoptions" class="anchor" href="#mocks-in-mocksoptions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mocks (in <code>mocks.options</code>)</h2>
 
 <ol>
-<li><p><code>LINK_IN_DEC</code> -- creates binning in declination for mocks. Please
-check that for your desired binning in <code>r_p</code> or <code>\theta</code>,
-this binning does not produce incorrect results (due to numerical
-precision).</p></li>
+<li><p><code>OUTPUT_RPAVG</code> -- switches on output of <code>&lt;rp&gt;</code> in each <code>rp</code>
+bin for <code>DDrppi_mocks</code>. Enabled by default.</p></li>
+<li><p><code>OUTPUT_THETAAVG</code> -- switches on output of in each theta bin. Can
+be extremely slow (~5x) depending on compiler, and CPU capabilities.
+Disabled by default.</p></li>
+<li><p><code>DOUBLE_PREC</code> -- switches on calculations in double precision. Disabled
+by default (i.e., calculations are performed in single precision by default).</p></li>
+<li><p><code>LINK_IN_DEC</code> -- creates binning in declination for <code>DDtheta</code>. Please
+check that for your desired limits <code>\theta</code>, this binning does not 
+produce incorrect results (due to numerical precision). Generally speaking,
+if your <code>\thetamax</code> (the max. <code>\theta</code> to consider pairs within) is too
+small (probaly less than 1 degree), then you should check with and without
+this option. Errors are typically sub-percent level. </p></li>
 <li><p><code>LINK_IN_RA</code> -- creates binning in RA once binning in DEC has been
 enabled. Same numerical issues as <code>LINK_IN_DEC</code></p></li>
-<li><p><code>FAST_DIVIDE</code> -- Divisions are slow but required
-<code>DD(r_p,\pi)</code>. This <code>Makefile</code> option (in <code>mocks.options</code>) replaces
-the divisions to a reciprocal followed by a Newton-Raphson. The code
+<li><p><code>FAST_DIVIDE</code> -- Disabled by default. Divisions are slow but required
+<code>DD(r_p,\pi)</code>. Enabling this option, replaces
+the divisions with a reciprocal followed by a Newton-Raphson. The code
 will run ~20% faster at the expense of some numerical precision.
 Please check that the loss of precision is not important for your
-use-case. Also, note that the mocks tests for <code>DD(r_p, \pi)</code>
-<em>will fail</em> if you enable <code>FAST_DIVIDE</code>.</p></li>
+use-case. </p></li>
+<li><p><code>FAST_ACOS</code> -- Relevant only when <code>OUTPUT_THETAAVG</code> is enabled. Disabled 
+by default. An <code>arccos</code> is required to calculate <code>&lt;\theta&gt;</code>. In absence of vectorized
+<code>arccos</code> (intel compiler, <code>icc</code> provides one via intel Short Vector Math 
+Library), this calculation is extremely slow. However, we can approximate
+<code>arccos</code> using polynomials (with <code>Remez Algorithm &lt;https://en.wikipedia.org/wiki/Remez_algorithm&gt;</code><em>).
+The approximations are taken from implementations released by <code>Geometric Tools &lt;http://geometrictools.com/&gt;</code></em>.
+Depending on the level of accuracy desired, this implementation of <code>fast acos</code> 
+can be tweaked in the file <code>utils/fast_acos.h &lt;utils/fast_acos.h&gt;</code>__. An alternate, less
+accurate implementation is already present in that file. Please check that the loss of 
+precision is not important for your use-case. </p></li>
+<li><p><code>COMOVING_DIST</code> -- Currently there is no support in <code>Corrfunc</code> for different cosmologies. However, for the
+mocks routines like, <code>DDrppi_mocks</code> and <code>vpf_mocks</code>, cosmology parameters are required to convert between
+redshift and co-moving distance. Both <code>DDrppi_mocks</code> and <code>vpf_mocks</code> expects to receive a <code>redshift</code> array 
+as input; however, with this option enabled, the <code>redshift</code> array will be assumed to contain already converted
+co-moving distances. So, if you have redshifts and want to use an arbitrary cosmology, then convert the redshifts
+into co-moving distances, enable this option, and pass the co-moving distance array into the routines. </p></li>
 </ol>
 
 <h1>
 <a id="running-the-codes" class="anchor" href="#running-the-codes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running the codes</h1>
 
-<p>The documentation is lacking currently but I am actively working on it.</p>
+<p>Read the documentation on <code>corrfunc.rtfd.io &lt;http://corrfunc.rtfd.io/&gt;</code>_.</p>
 
 <h2>
 <a id="using-the-command-line-interface" class="anchor" href="#using-the-command-line-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using the command-line interface</h2>
@@ -228,7 +272,7 @@ clustering measures.</p>
 <p>If all went well, the codes can be directly called from <code>python</code>.
 Please see <code>Corrfunc/call_correlation_functions.py</code> and
 <code>Corrfunc/call_correlation_functions_mocks.py</code> for examples on how to
-use the Python interface. Here are a few examples:</p>
+use the C extensions directly. Here are a few examples:</p>
 
 <p>.. code:: python</p>
 
@@ -268,33 +312,16 @@ for wp in wp_results:
 </code></pre>
 
 <h1>
-<a id="benchmark-against-existing-codes" class="anchor" href="#benchmark-against-existing-codes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Benchmark against Existing Codes</h1>
-
-<p>Please see this
-<code>gist &lt;https://gist.github.com/manodeep/cffd9a5d77510e43ccf0&gt;</code>__ for
-some benchmarks with current codes.</p>
-
-<h1>
 <a id="common-code-options-for-both-mocks-and-cosmological-boxes" class="anchor" href="#common-code-options-for-both-mocks-and-cosmological-boxes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Common Code options for both Mocks and Cosmological Boxes</h1>
 
 <ol>
-<li><p><code>DOUBLE_PREC</code> -- does the calculations in double precision.
-Disabled by default.</p></li>
 <li>
-<p><code>USE_AVX</code> -- uses the AVX instruction set found in Intel/AMD CPUs</p>
-
-<blockquote>
-<p>= 2011 (Intel: Sandy Bridge or later; AMD: Bulldozer or later).
-Enabled by default - code will run much slower if the CPU does not
-support AVX instructions. The <code>Makefile</code> will automatically check
-for "AVX" support and disable this option for unsupported CPUs. </p>
-</blockquote>
-</li>
-<li><p><code>USE_OMP</code> -- uses OpenMP parallelization. Scaling is great for DD
+<code>USE_OMP</code> -- uses OpenMP parallelization. Scaling is great for DD
 (perfect scaling up to 12 threads in my tests) and okay (runtime
 becomes constant ~6-8 threads in my tests) for <code>DDrppi</code> and <code>wp</code>.
 Enabled by default. The <code>Makefile</code> will compare the <code>CC</code> variable with
-known OpenMP enabled compilers and set compile options accordingly. </p></li>
+known OpenMP enabled compilers and set compile options accordingly. 
+Set in <code>common.mk</code> by default. </li>
 </ol>
 
 <p><em>Optimization for your architecture</em></p>
@@ -325,14 +352,15 @@ for the code is</p>
 
 <p>::</p>
 
-<p><a href="https://github.com/misc" class="user-mention">@misc</a>{manodeep_sinha_2016_55161,
-       author       = {Manodeep Sinha},
-       title        = {Corrfunc: Corrfunc-1.1.0},
-       month        = jun,
-       year         = 2016,
-       doi          = {10.5281/zenodo.55161},
-       url          = {<a href="http://dx.doi.org/10.5281/zenodo.55161">http://dx.doi.org/10.5281/zenodo.55161</a>}
-   }</p>
+<pre><code>  @misc{manodeep_sinha_2016_61511,
+     author       = {Manodeep Sinha},
+     title        = {Corrfunc: Corrfunc-2.0.0},
+     month        = sep,
+     year         = 2016,
+     doi          = {10.5281/zenodo.61511},
+     url          = {http://dx.doi.org/10.5281/zenodo.61511}
+  }
+</code></pre>
 
 <h1>
 <a id="mailing-list" class="anchor" href="#mailing-list" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mailing list</h1>
@@ -351,21 +379,32 @@ with the code including using it in commercial application.</p>
 
 <ul>
 <li> website (<a href="https://manodeep.github.io/Corrfunc/">https://manodeep.github.io/Corrfunc/</a>)</li>
+<li> documentation (<a href="http://corrfunc.rtfd.io/">http://corrfunc.rtfd.io/</a>)<br>
+</li>
 <li> version control (<a href="https://github.com/manodeep/Corrfunc">https://github.com/manodeep/Corrfunc</a>)</li>
 </ul>
 
 <p>.. |Release| image:: <a href="https://img.shields.io/github/release/manodeep/Corrfunc.svg">https://img.shields.io/github/release/manodeep/Corrfunc.svg</a>
    :target: <a href="https://github.com/manodeep/Corrfunc/releases/latest">https://github.com/manodeep/Corrfunc/releases/latest</a>
+   :alt: Latest Release
 .. |MIT licensed| image:: <a href="https://img.shields.io/badge/license-MIT-blue.svg">https://img.shields.io/badge/license-MIT-blue.svg</a>
    :target: <a href="https://raw.githubusercontent.com/manodeep/Corrfunc/master/LICENSE">https://raw.githubusercontent.com/manodeep/Corrfunc/master/LICENSE</a>
+   :alt: MIT License
 .. |DOI| image:: <a href="https://zenodo.org/badge/19184/manodeep/Corrfunc.svg">https://zenodo.org/badge/19184/manodeep/Corrfunc.svg</a>
    :target: <a href="https://zenodo.org/badge/latestdoi/19184/manodeep/Corrfunc">https://zenodo.org/badge/latestdoi/19184/manodeep/Corrfunc</a>
+   :alt: Zenodo DOI
 .. |Travis Build| image:: <a href="https://travis-ci.org/manodeep/Corrfunc.svg?branch=master">https://travis-ci.org/manodeep/Corrfunc.svg?branch=master</a>
    :target: <a href="https://travis-ci.org/manodeep/Corrfunc">https://travis-ci.org/manodeep/Corrfunc</a>
+   :alt: Build Status
 .. |Issues| image:: <a href="https://img.shields.io/github/issues/manodeep/Corrfunc.svg">https://img.shields.io/github/issues/manodeep/Corrfunc.svg</a>
    :target: <a href="https://github.com/manodeep/Corrfunc/issues">https://github.com/manodeep/Corrfunc/issues</a>
+   :alt: Open Issues
 .. |Coverity| image:: <a href="https://img.shields.io/coverity/scan/6982.svg">https://img.shields.io/coverity/scan/6982.svg</a>
-   :target: <a href="https://scan.coverity.com/projects/manodeep-corrfunc">https://scan.coverity.com/projects/manodeep-corrfunc</a></p>
+   :target: <a href="https://scan.coverity.com/projects/manodeep-corrfunc">https://scan.coverity.com/projects/manodeep-corrfunc</a>
+   :alt: Code Health
+.. |RTD| image:: <a href="https://readthedocs.org/projects/corrfunc/badge/?version=master">https://readthedocs.org/projects/corrfunc/badge/?version=master</a>
+   :target: <a href="http://corrfunc.readthedocs.io/en/master/?badge=master">http://corrfunc.readthedocs.io/en/master/?badge=master</a>
+   :alt: Documentation Status</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/manodeep">manodeep</a></p>
