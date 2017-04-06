@@ -1,3 +1,4 @@
+// # -*- mode: c -*-
 /* File: gridlink_impl.h.src */
 /*
   This file is a part of the Corrfunc package
@@ -14,7 +15,7 @@ extern "C" {
 #endif
 
 #include "cellarray_DOUBLE.h"
-
+#include <inttypes.h>
 
   extern int get_binsize_DOUBLE(const DOUBLE xmin,const DOUBLE xmax,
                                 const DOUBLE rmax,
@@ -47,7 +48,7 @@ extern "C" {
     
 
   extern cellarray_index_particles_DOUBLE * gridlink_index_particles_DOUBLE(const int64_t np,
-                                                                            const DOUBLE *x, const DOUBLE *y, const DOUBLE *z,
+                                                                            const DOUBLE *x, const DOUBLE *y, const DOUBLE *z, const weight_struct *weights,
                                                                             const DOUBLE xmin, const DOUBLE xmax,
                                                                             const DOUBLE ymin, const DOUBLE ymax,
                                                                             const DOUBLE zmin, const DOUBLE zmax,

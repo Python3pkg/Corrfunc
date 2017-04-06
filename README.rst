@@ -1,4 +1,4 @@
-|Release| |MIT licensed| |DOI| |Travis Build| |Issues| |Coverity| |RTD|
+|Release| |PyPI| |MIT licensed| |DOI| |ASCL| |Travis Build| |Issues| |RTD| |Landscape| |Gitter|
 
 Description
 ===========
@@ -7,15 +7,21 @@ This repo contains a set of codes to measure the following OpenMP
 parallelized clustering measures in a cosmological box (co-moving XYZ)
 or on a mock (RA, DEC, CZ). Also, contains the associated paper to be
 published in Astronomy & Computing Journal (at some point). Read the
-documentation on `corrfunc.rtfd.io <http://corrfunc.rtfd.io/>`_.
+documentation on `corrfunc.rtfd.io <http://corrfunc.rtfd.io/>`_. 
+
+**NOTE** ``v2.0`` is a significant update in terms of capability and is currently *only* available by directly ``cloning`` the repo and not through ``PyPI`` (documentation on ``rtfd.io`` corresponds to ``v2.0``).
 
 Why Should You Use it
 ======================
 
-1. **Fast** All theory pair-counting is at least an order of magnitude faster than all existing public codes. Particularly suited for MCMC. 
-2. **Python Extensions** Python extensions allow you to do the compute-heavy bits using C while retaining all of the user-friendliness of python. 
-3. **Modular** The code is written in a modular fashion and is easily extensible to compute arbitrary clustering statistics. 
-4. **Future-proof** As I get access to newer instruction-sets, the codes will get updated to use the latest and greatest CPU features. 
+1. **Fast** Theory pair-counting is **7x** faster than ``SciPy cKDTree``, and at least **2x** faster than all existing public codes.
+2. **OpenMP Parallel** All pair-counting codes can be done in parallel (with strong scaling efficiency >~ 95% up to 10 cores)
+3. **Python Extensions** Python extensions allow you to do the compute-heavy bits using C while retaining all of the user-friendliness of python. 
+4. **Weights** All correlation functions now support weights for individual points (in ``master`` branch, upcoming in `v2.0.0 <https://github.com/manodeep/Corrfunc/releases/tag/2.0.0>`_)
+5. **Modular** The code is written in a modular fashion and is easily extensible to compute arbitrary clustering statistics. 
+6. **Future-proof** As I get access to newer instruction-sets, the codes will get updated to use the latest and greatest CPU features. 
+
+*If you use the codes for your analysis, please star this repo -- that helps us keep track of the number of users.*
 
 Benchmark against Existing Codes
 ================================
@@ -31,14 +37,12 @@ Pre-requisites
 --------------
 
 1. ``make >= 3.80``
-2. OpenMP capable compiler like ``icc``, ``gcc`` or ``clang >= 3.7``. If
+2. OpenMP capable compiler like ``icc``, ``gcc>=4.6`` or ``clang >= 3.7``. If
    not available, please disable ``USE_OMP`` option option in
    ``theory.options`` and ``mocks.options``. You might need to ask your
    sys-admin for system-wide installs of the compiler; if you prefer to
    install your own then ``conda install gcc`` (MAC/linux) or
-   ``(sudo) port install gcc5`` (on MAC) should work. *Note ``gcc`` on
-   macports defaults to ``gcc48`` and the portfile is currently broken
-   on ``El Capitan``*.
+   ``(sudo) port install gcc5`` (on MAC) should work. 
 3. ``gsl``. Use either
    ``conda install -c https://conda.anaconda.org/asmeurer gsl``
    (MAC/linux) or ``(sudo) port install gsl`` (MAC) to install ``gsl``
@@ -46,14 +50,8 @@ Pre-requisites
 4. ``python >= 2.6`` or ``python>=3.4`` for compiling the C extensions.
 5. ``numpy>=1.7`` for compiling the C extensions.
 
-*If python and/or numpy are not available, then the C extensions will
-not be compiled.*
-
-*Default compiler on MAC is set to* ``clang``, *if you want to specify a
-different compiler, you will have to call* ``make CC=yourcompiler``
-
-Preferred Method
-----------------
+Preferred Install Method
+-------------------------
 
 ::
 
@@ -67,12 +65,22 @@ Assuming you have ``gcc`` in your ``PATH``, ``make`` and
 ``make install`` should compile and install the C libraries + python
 extensions within the source directory. If you would like to install the
 python C extensions in your environment, then
-``python setup.py install (--user)`` should be sufficient.
+``python setup.py install (--user)`` should be sufficient. If you are primarily
+interested in the ``python`` interface, you can condense all of the steps
+by using ``python setup.py install CC=yourcompiler (--user)`` after ``git clone``.
 
-Alternative
------------
+Compilation Notes
+------------------
 
-The python package is directly installable via ``pip install Corrfunc``. However, in that case you will lose the ability to recompile the code according to your needs. Not recommended unless you are desperate (i.e., `email me <mailto:manodeep@gmail.com>`__ if you are having install issues). 
+- If python and/or numpy are not available, then the C extensions will not be compiled.
+
+- Default compiler on MAC is set to ``clang``, if you want to specify a different compiler, you will have to call ``make CC=yourcompiler``
+
+
+Alternate Install Method
+-------------------------
+
+The python package is directly installable via ``pip install Corrfunc``. However, in that case you will lose the ability to recompile the code according to your needs. Installing via `pip` is **not** recommended, please open an install issue on this repo first; doing so helps improve the code-base and saves future users from running into similar install issues. 
 
 Installation notes
 ------------------
@@ -86,14 +94,14 @@ While I have tried to ensure that the package compiles and runs out of
 the box, cross-platform compatibility turns out to be incredibly hard.
 If you run into any issues during compilation and you have all of the
 pre-requisites, please see the `FAQ <FAQ>`__ or `email
-me <mailto:manodeep@gmail.com>`__. Also, feel free to create a new issue
+the Corrfunc mailing list <mailto:corrfunc@googlegroups.com>`__. Also, feel free to create a new issue
 with the ``Installation`` label.
 
 Clustering Measures on a Cosmological box
 -----------------------------------------
 
 All codes that work on cosmological boxes with co-moving positions are
-located in the ``xi_theory`` directory. The various clustering measures
+located in the ``theory`` directory. The various clustering measures
 are:
 
 1. ``xi_of_r`` -- Measures auto/cross-correlations between two boxes.
@@ -114,7 +122,7 @@ Clustering measures on a Mock
 -----------------------------
 
 All codes that work on mock catalogs (RA, DEC, CZ) are located in the
-``xi_mocks`` directory. The various clustering measures are:
+``mocks`` directory. The various clustering measures are:
 
 1. ``DDrppi`` -- The standard auto/cross correlation between two data
    sets. The outputs, DD, DR and RR can be combined using ``wprp`` to
@@ -129,37 +137,76 @@ All codes that work on mock catalogs (RA, DEC, CZ) are located in the
 Science options
 ===============
 
+If you plan to use the command-line, then you will have to specify the
+code runtime options at compile-time. For theory routines, these options
+are in the file ``theory.options`` while for the mocks, these options are
+in file ``mocks.options``. 
+
+**Note** All options can be specified at 
+runtime if you use the python interface or the static libraries. Each one of
+the following ``Makefile`` option has a corresponding entry for the runtime
+libraries. 
+
+Theory (in ``theory.options``)
+-------------------------------
+
 1. ``PERIODIC`` (ignored in case of wp/xi) -- switches periodic boundary
    conditions on/off. Enabled by default.
 
 2. ``OUTPUT_RPAVG`` -- switches on output of ``<rp>`` in each ``rp``
    bin. Can be a massive performance hit (~ 2.2x in case of wp).
-   Disabled by default. Needs code option ``DOUBLE_PREC`` to be enabled
-   as well. For the mocks, ``OUTPUT_RPAVG`` causes only a mild increase
-   in runtime and is enabled by default.
+   Disabled by default. 
 
-3. ``OUTPUT_THETAAVG`` -- switches on output of in each theta bin. Can
+3. ``DOUBLE_PREC`` -- switches on calculations in double precision. Disabled
+   by default (i.e., calculations are performed in single precision by default).
+   
+Mocks (in ``mocks.options``)
+----------------------------
+
+1. ``OUTPUT_RPAVG`` -- switches on output of ``<rp>`` in each ``rp``
+   bin for ``DDrppi_mocks``. Enabled by default.
+
+2. ``OUTPUT_THETAAVG`` -- switches on output of in each theta bin. Can
    be extremely slow (~5x) depending on compiler, and CPU capabilities.
    Disabled by default.
 
-Mocks
------
+3. ``DOUBLE_PREC`` -- switches on calculations in double precision. Disabled
+   by default (i.e., calculations are performed in single precision by default).
+   
+4. ``LINK_IN_DEC`` -- creates binning in declination for ``DDtheta``. Please
+   check that for your desired limits ``\theta``, this binning does not 
+   produce incorrect results (due to numerical precision). Generally speaking,
+   if your ``\thetamax`` (the max. ``\theta`` to consider pairs within) is too
+   small (probaly less than 1 degree), then you should check with and without
+   this option. Errors are typically sub-percent level. 
 
-1. ``LINK_IN_DEC`` -- creates binning in declination for mocks. Please
-   check that for your desired binning in `r_p` or `\theta`,
-   this binning does not produce incorrect results (due to numerical
-   precision).
-
-2. ``LINK_IN_RA`` -- creates binning in RA once binning in DEC has been
+5. ``LINK_IN_RA`` -- creates binning in RA once binning in DEC has been
    enabled. Same numerical issues as ``LINK_IN_DEC``
 
-3. ``FAST_DIVIDE`` -- Divisions are slow but required
-   `DD(r_p,\pi)`. This ``Makefile`` option (in ``mocks.options``) replaces
-   the divisions to a reciprocal followed by a Newton-Raphson. The code
+6. ``FAST_DIVIDE`` -- Disabled by default. Divisions are slow but required
+   ``DD(r_p,\pi)``. Enabling this option, replaces
+   the divisions with a reciprocal followed by a Newton-Raphson. The code
    will run ~20% faster at the expense of some numerical precision.
    Please check that the loss of precision is not important for your
-   use-case. Also, note that the mocks tests for `DD(r_p, \pi)`
-   *will fail* if you enable ``FAST_DIVIDE``.
+   use-case. 
+
+7. ``FAST_ACOS`` -- Relevant only when ``OUTPUT_THETAAVG`` is enabled. Disabled 
+   by default. An ``arccos`` is required to calculate ``<\theta>``. In absence of vectorized
+   ``arccos`` (intel compiler, ``icc`` provides one via intel Short Vector Math 
+   Library), this calculation is extremely slow. However, we can approximate
+   ``arccos`` using polynomials (with `Remez Algorithm <https://en.wikipedia.org/wiki/Remez_algorithm>`_).
+   The approximations are taken from implementations released by `Geometric Tools <http://geometrictools.com/>`_.
+   Depending on the level of accuracy desired, this implementation of ``fast acos`` 
+   can be tweaked in the file `utils/fast_acos.h <utils/fast_acos.h>`__. An alternate, less
+   accurate implementation is already present in that file. Please check that the loss of 
+   precision is not important for your use-case. 
+
+8. ``COMOVING_DIST`` -- Currently there is no support in ``Corrfunc`` for different cosmologies. However, for the
+   mocks routines like, ``DDrppi_mocks`` and ``vpf_mocks``, cosmology parameters are required to convert between
+   redshift and co-moving distance. Both ``DDrppi_mocks`` and ``vpf_mocks`` expects to receive a ``redshift`` array 
+   as input; however, with this option enabled, the ``redshift`` array will be assumed to contain already converted
+   co-moving distances. So, if you have redshifts and want to use an arbitrary cosmology, then convert the redshifts
+   into co-moving distances, enable this option, and pass the co-moving distance array into the routines. 
 
 Running the codes
 =================
@@ -177,15 +224,15 @@ what you want. If not, edit those two files (and possibly
 executables in each individual subdirectory corresponding to the
 clustering measure you are interested in. For example, if you want to
 compute the full 3-D correlation function, ``\xi(r)``, then navigate to
-``xi_theory/xi`` and run the executable ``xi``. If you run executables
+``theory/xi`` and run the executable ``xi``. If you run executables
 without any arguments, the message will you tell you all the required
 arguments.
 
 Calling from C
 --------------
 
-Look under the ``xi_theory/examples/run_correlations.c`` and
-``xi_mocks/examples/run_correlations_mocks.c`` to see examples of
+Look under the ``theory/examples/run_correlations.c`` and
+``mocks/examples/run_correlations_mocks.c`` to see examples of
 calling the C API directly. If you run the executables,
 ``run_correlations`` and ``run_correlations_mocks``, the output will
 also show how to call the command-line interface for the various
@@ -197,7 +244,7 @@ Calling from Python
 If all went well, the codes can be directly called from ``python``.
 Please see ``Corrfunc/call_correlation_functions.py`` and
 ``Corrfunc/call_correlation_functions_mocks.py`` for examples on how to
-use the Python interface. Here are a few examples:
+use the C extensions directly. Here are a few examples:
 
 .. code:: python
 
@@ -205,7 +252,7 @@ use the Python interface. Here are a few examples:
     import os.path as path
     import numpy as np
     import Corrfunc
-    from Corrfunc._countpairs import countpairs_wp as wp
+    from Corrfunc.theory import wp
 
     # Setup the problem for wp
     boxsize = 500.0
@@ -221,38 +268,33 @@ use the Python interface. Here are a few examples:
     y *= boxsize
     z *= boxsize
 
-    # Use a file with histogram bins, containing Nbins pairs of (rmin rmax)
-    binfile = path.join(path.dirname(path.abspath(Corrfunc.__file__)), "../xi_theory/tests/", "bins")
+    # Setup the bins
+    rmin = 0.1
+    rmax = 20.0
+    nbins = 20
+    
+    # Create the bins
+    rbins = np.logspace(np.log10(0.1), np.log10(rmax), nbins)
 
     # Call wp
-    wp_results = wp(boxsize, pimax, nthreads, binfile, x, y, z)
+    wp_results = wp(boxsize, pimax, nthreads, rbins, x, y, z, verbose=True, output_rpavg=True)
 
     # Print the results
-    print("###########################################")
-    print("##   rmin       rmax        wp       npairs")
-    print("###########################################")
-    for wp in wp_results:
-        print("{0:10.4f} {1:10.4f} {2:12.6f} {3:8d}"
-              .format(wp[0], wp[1], wp[3], wp[4]))
+    print("#############################################################################")
+    print("##       rmin           rmax            rpavg             wp            npairs")
+    print("#############################################################################")
+    print(wp_results)
                                                         
 
 Common Code options for both Mocks and Cosmological Boxes
 =========================================================
 
-1. ``DOUBLE_PREC`` -- does the calculations in double precision.
-   Disabled by default.
-
-2. ``USE_AVX`` -- uses the AVX instruction set found in Intel/AMD CPUs
-   >= 2011 (Intel: Sandy Bridge or later; AMD: Bulldozer or later).
-   Enabled by default - code will run much slower if the CPU does not
-   support AVX instructions. The ``Makefile`` will automatically check
-   for "AVX" support and disable this option for unsupported CPUs. 
-
-3. ``USE_OMP`` -- uses OpenMP parallelization. Scaling is great for DD
+1. ``USE_OMP`` -- uses OpenMP parallelization. Scaling is great for DD
    (perfect scaling up to 12 threads in my tests) and okay (runtime
    becomes constant ~6-8 threads in my tests) for ``DDrppi`` and ``wp``.
    Enabled by default. The ``Makefile`` will compare the `CC` variable with
    known OpenMP enabled compilers and set compile options accordingly. 
+   Set in ``common.mk`` by default. 
 
 *Optimization for your architecture*
 
@@ -267,11 +309,11 @@ Common Code options for both Mocks and Cosmological Boxes
    the ``*_kernels.c`` and edit the runtime dispatch code to call this new
    kernel. 
 
-Author
-======
+Author & Maintainers 
+=====================
 
-Corrfunc is written/maintained by Manodeep Sinha. Please contact the
-`author <mailto:manodeep@gmail.com>`__ in case of any issues.
+Corrfunc was designed by Manodeep Sinha and is currently maintained by
+`Lehman Garrison <https://github.com/lgarrison>`_ and `Manodeep Sinha <https://github.com/manodeep>`_
 
 Citing
 ======
@@ -281,14 +323,14 @@ for the code is
 
 ::
 
-   @misc{manodeep_sinha_2016_55161,
-       author       = {Manodeep Sinha},
-       title        = {Corrfunc: Corrfunc-1.1.0},
-       month        = jun,
-       year         = 2016,
-       doi          = {10.5281/zenodo.55161},
-       url          = {http://dx.doi.org/10.5281/zenodo.55161}
-   }
+      @misc{manodeep_sinha_2016_61511,
+         author       = {Manodeep Sinha},
+         title        = {Corrfunc: Corrfunc-2.0.0},
+         month        = sep,
+         year         = 2016,
+         doi          = {10.5281/zenodo.61511},
+         url          = {http://dx.doi.org/10.5281/zenodo.61511}
+      }
        
 Mailing list
 ============
@@ -312,21 +354,32 @@ Project URL
 .. |Release| image:: https://img.shields.io/github/release/manodeep/Corrfunc.svg
    :target: https://github.com/manodeep/Corrfunc/releases/latest
    :alt: Latest Release
+
+.. |PyPI| image:: https://img.shields.io/pypi/v/Corrfunc.svg
+   :target: https://pypi.python.org/pypi/Corrfunc
+   :alt: PyPI Release
 .. |MIT licensed| image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/manodeep/Corrfunc/master/LICENSE
    :alt: MIT License
 .. |DOI| image:: https://zenodo.org/badge/19184/manodeep/Corrfunc.svg
    :target: https://zenodo.org/badge/latestdoi/19184/manodeep/Corrfunc
    :alt: Zenodo DOI
+.. |ASCL| image:: https://img.shields.io/badge/ascl-1703.003-blue.svg?colorB=262255
+   :target: http://ascl.net/1703.003
+   :alt: ascl:1703.003
 .. |Travis Build| image:: https://travis-ci.org/manodeep/Corrfunc.svg?branch=master
    :target: https://travis-ci.org/manodeep/Corrfunc
    :alt: Build Status
 .. |Issues| image:: https://img.shields.io/github/issues/manodeep/Corrfunc.svg
    :target: https://github.com/manodeep/Corrfunc/issues
    :alt: Open Issues
-.. |Coverity| image:: https://img.shields.io/coverity/scan/6982.svg
-   :target: https://scan.coverity.com/projects/manodeep-corrfunc
-   :alt: Code Health
 .. |RTD| image:: https://readthedocs.org/projects/corrfunc/badge/?version=master
    :target: http://corrfunc.readthedocs.io/en/master/?badge=master
    :alt: Documentation Status
+.. |Landscape| image:: https://landscape.io/github/manodeep/Corrfunc/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/manodeep/Corrfunc/master
+   :alt: Code Health
+
+.. |Gitter| image:: https://badges.gitter.im/Corrfunc/Lobby.svg
+   :alt: Join the chat at https://gitter.im/Corrfunc/Lobby
+   :target: https://gitter.im/Corrfunc/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge

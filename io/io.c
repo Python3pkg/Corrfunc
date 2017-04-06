@@ -16,6 +16,7 @@
 #include "io.h"
 #include "ftread.h"
 #include "utils.h"
+#include "macros.h"
 
 #ifndef MEMORY_INCREASE_FAC
 #define MEMORY_INCREASE_FAC 1.1
@@ -25,14 +26,33 @@
 #define MAXLEN 500
 #endif
 
-
 int64_t read_positions(const char *filename, const char *format, const size_t size, const int num_fields, ...)
 {
+    XRETURN((sizeof(void *) == sizeof(float *) && sizeof(void *) == sizeof(double *)), -1,
+            "Size of void pointer = %zu must be the same as size of float pointer = %zu and sizeof double pointers = %zu\n",
+            sizeof(void *), sizeof(float *), sizeof(double *));
+            
+    void *columns[num_fields];
+    int64_t np = read_columns_into_array(filename, format, size, num_fields, columns);
+    
+    va_list ap;
+    va_start(ap,num_fields);
+    
+    for(int i=0;i<num_fields;i++) {
+        void **source = va_arg(ap, void **);
+        *source =  columns[i];
+    }
+    va_end(ap);
+
+    return np;
+}
+
+
+int64_t read_columns_into_array(const char *filename, const char *format, const size_t size, const int num_fields, void **data){
     int64_t np;
     XRETURN(num_fields >= 1, -1, "Number of fields to read-in = %d must be at least 1\n", num_fields);
     XRETURN((size == 4 || size == 8), -1, "Size of fields = %zu must be either 4 or 8\n", size);
     
-    void *data[num_fields];
     {
         //new scope - just to check if file is gzipped.
         //in that case, use gunzip to unzip the file.
@@ -76,14 +96,16 @@ int64_t read_positions(const char *filename, const char *format, const size_t si
 
     if(strncmp(format,"f",1)==0) { /*Read-in fast-food file*/
         //read fast-food file
-        size_t bytes=sizeof(int) + sizeof(float)*9 + sizeof(int);//skip fdat
-        bytes += sizeof(int) + sizeof(float) + sizeof(int); //skip znow
         int idat[5];
+        float fdat[9];
+        size_t bytes=sizeof(int) + sizeof(fdat) + sizeof(int);//skip fdat
+        bytes += sizeof(int) + sizeof(float) + sizeof(int); //skip znow
+
         FILE *fp = my_fopen(filename,"r");
         if(fp == NULL) {
             return -1;
         }
-        int status = my_ftread(idat,sizeof(int),5,fp);
+        int status = my_ftread(idat,sizeof(idat[0]),5,fp);
         if(status != EXIT_SUCCESS) {
             return -1;
         }
@@ -104,9 +126,9 @@ int64_t read_positions(const char *filename, const char *format, const size_t si
         unsigned int dummy;
         my_fread(&dummy,sizeof(dummy), 1, fp);
         //so rewind by 4 bytes  prepare for calls to ftread
-        my_fseek(fp, -sizeof(dummy), SEEK_CUR);
+        my_fseek(fp, -4, SEEK_CUR);
         dummy /= np;
-        XASSERT((dummy == 4 || dummy == 8), "Data-type in file = %u must be either 4 byte (float) or 8 byte(double) precision", dummy);
+        XRETURN((dummy == 4 || dummy == 8), -1, "Data-type in file = %u must be either 4 byte (float) or 8 byte(double) precision", dummy);
 
         if(dummy == size) {
             for(int i=0;i<num_fields;i++) {
@@ -123,7 +145,7 @@ int64_t read_positions(const char *filename, const char *format, const size_t si
             //First, print a warning message and then read-in correctly with the
             //requested precision
             if(dummy == 4) {
-                XASSERT(size == 8, "size = %zu should have been 8 (doubles were expected)\n", size);
+                XRETURN(size == 8, -1, "size = %zu should have been 8 (doubles were expected)\n", size);
                 float *tmp = my_malloc(dummy,np);
                 if(tmp == NULL) {
                     return -1;
@@ -142,7 +164,7 @@ int64_t read_positions(const char *filename, const char *format, const size_t si
                 //free memory
                 free(tmp);
             } else {
-                XASSERT(size == 4, "size = %zu should have been 4 (floats were expected)\n", size);
+                XRETURN(size == 4, -1, "size = %zu should have been 4 (floats were expected)\n", size);
                 double *tmp = my_malloc(dummy,np);
                 if(tmp == NULL) {
                     return -1;
@@ -257,19 +279,6 @@ int64_t read_positions(const char *filename, const char *format, const size_t si
         fprintf(stderr,"ERROR: In %s> Unknown format `%s'\n",__FUNCTION__,format);
         return -1;
     }
-
-    va_list ap;
-    va_start(ap,num_fields);
-
-    XASSERT((sizeof(void *) == sizeof(float *) && sizeof(void *) == sizeof(double *)),
-            "Size of void pointer = %zu must be the same as size of float pointer = %zu and sizeof double pointers = %zu\n",
-            sizeof(void *), sizeof(float *), sizeof(double *));
     
-    for(int i=0;i<num_fields;i++) {
-        void **source = va_arg(ap, void **);
-        *source =  data[i];
-    }
-    va_end(ap);
-
     return np;
 }

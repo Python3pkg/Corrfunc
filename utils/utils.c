@@ -22,11 +22,36 @@
   print_time with timeval and gettimeofday
 */
 
-#include "utils.h"
-/* #define __USE_XOPEN2K */
-/* #define _XOPEN_SOURCE_EXTENDED */
-/* #define _GNU_SOURCE  */
+#include<inttypes.h>//defines PRId64 for printing int64_t + includes stdint.h
+#include<math.h>
+#include<string.h>
+#include<limits.h>
+#include<stdarg.h>
 
+#include "macros.h"
+#include "utils.h"
+
+#ifdef __MACH__ // OS X does not have clock_gettime, use clock_get_time
+#include <mach/mach_time.h> /* mach_absolute_time -> really fast */
+#endif
+
+void get_max_float(const int64_t ND1, const float *cz1, float *czmax)
+{
+    float max=*czmax;
+    for(int64_t i=0;i<ND1;i++) {
+        if(cz1[i] > max) max = cz1[i];
+    }
+    *czmax = max;
+}
+
+void get_max_double(const int64_t ND1, const double *cz1, double *czmax)
+{
+    double max=*czmax;
+    for(int64_t i=0;i<ND1;i++) {
+        if(cz1[i] > max) max = cz1[i];
+    }
+    *czmax = max;
+}
 
 
 int setup_bins(const char *fname,double *rmin,double *rmax,int *nbin,double **rupp)
@@ -327,6 +352,43 @@ char * int2bin(int a, char *buffer, int buf_size)
     return buffer;
 }
 
+
+/*
+Can not remember where I (MS) got this from. Fairly sure
+stackoverflow was involved.
+Finally taken from http://stackoverflow.com/a/6719178/2237582 */
+void current_utc_time(struct timespec *ts)
+{
+
+#ifdef __MACH__ // OS X does not have clock_gettime, use clock_get_time
+    static mach_timebase_info_data_t    sTimebaseInfo = {.numer=0, .denom=0};
+    uint64_t start = mach_absolute_time();
+    if ( sTimebaseInfo.denom == 0 ) {
+        mach_timebase_info(&sTimebaseInfo);
+    }
+
+    ts->tv_sec = 0;//(start * sTimebaseInfo.numer/sTimebaseInfo.denom) * tv_nsec;
+    ts->tv_nsec = start * sTimebaseInfo.numer / sTimebaseInfo.denom;
+    
+#if 0
+    //Much slower implementation for clock
+    //Slows down the code by up to 4x
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+    clock_get_time(cclock, &mts);
+    mach_port_deallocate(mach_task_self(), cclock);
+    ts->tv_sec = mts.tv_sec;
+    ts->tv_nsec = mts.tv_nsec;
+#endif    
+    
+#else
+    clock_gettime(CLOCK_REALTIME, ts);
+#endif
+}    
+
+
+
 /*
   I like this particular function. Generic replacement for printing
   (in meaningful units) the actual execution time of a code/code segment.
@@ -353,7 +415,7 @@ char * get_time_string(struct timeval t0,struct timeval t1)
 {
   const size_t MAXLINESIZE = 1024;
   char *time_string = my_malloc(sizeof(char), MAXLINESIZE);
-  double timediff = difftime(t1.tv_sec,t0.tv_sec);
+  double timediff = t1.tv_sec - t0.tv_sec;
   double ratios[] = {24*3600.0,  3600.0,  60.0,  1};
   char units[4][10]  = {"days", "hrs" , "mins", "secs"};
   int which = 0;
@@ -388,7 +450,7 @@ char * get_time_string(struct timeval t0,struct timeval t1)
 
 void print_time(struct timeval t0,struct timeval t1,const char *s)
 {
-    double timediff = difftime(t1.tv_sec,t0.tv_sec);
+    double timediff = t1.tv_sec - t0.tv_sec;
     double ratios[] = {24*3600.0,  3600.0,  60.0,  1};
     char units[4][10]  = {"days", "hrs" , "mins", "secs"};
     int which = 0;
@@ -521,9 +583,28 @@ void **matrix_calloc(size_t size,int64_t nrow,int64_t ncol)
 }
 
 
+// Resize a matrix.  Returns EXIT_SUCCESS or EXIT_FAILURE.
+// Presently only resizing the last dimension is supported, due to
+// potential memory leaks when shrinking the first dimension
+int matrix_realloc(void **matrix, size_t size, int64_t nrow, int64_t ncol){
+    void *tmp;
+    for(int i = 0; i < nrow; i++){
+        tmp = my_realloc(matrix[i], size, ncol, "matrix_realloc");
+        if(tmp == NULL){
+            return EXIT_FAILURE;
+        }
+        matrix[i] = tmp;
+    }
+    
+    return EXIT_SUCCESS;
+}
+
 
 void matrix_free(void **m,int64_t nrow)
 {
+    if(m == NULL)
+        return;
+    
     for(int i=0;i<nrow;i++)
         free(m[i]);
 
@@ -688,5 +769,81 @@ int test_all_files_present(const int nfiles, ...)
     return absent;
 }
 
+
+/* int float_almost_equal(const float A, const float B, int maxUlps) */
+/* { */
+/*     /\* MS -- taken from */
+/*        http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm */
+/*     *\/ */
+
+/*     const int upper_limit_maxulps = 4 * 1024 * 1024; */
+/*     /\* Make sure maxUlps is non-negative and small enough that the */
+/*        default NAN won't compare as equal to anything.*\/ */
+/*     if(maxUlps <= 0 || maxUlps >= upper_limit_maxulps){ */
+/*         fprintf(stderr,"Error: Comparison between floats should have smaller number of max. units in last place. Found maxUlps = %d (max allowed = %d)\n", */
+/*                 maxUlps, upper_limit_maxulps); */
+/*         return EXIT_FAILURE; */
+/*     } */
+/*     int aInt = *(int*)&A; */
+    
+/*     /\* Make aInt lexicographically ordered as a twos-complement int*\/ */
+/*     if (aInt < 0) */
+/*         aInt = 0x80000000 - aInt; */
+    
+/*     /\* Make bInt lexicographically ordered as a twos-complement int*\/ */
+    
+/*     int bInt = *(int*)&B; */
+/*     if (bInt < 0) */
+/*         bInt = 0x80000000 - bInt; */
+    
+/*     int intDiff = abs(aInt - bInt); */
+/*     if (intDiff <= maxUlps) */
+/*         return 1; */
+    
+/*     return 0; */
+/* } */
+
+
+/* Directly taken from https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/ */
+int AlmostEqualRelativeAndAbs_float(float A, float B,
+                                    const float maxDiff,
+                                    const float maxRelDiff)
+{
+    // Check if the numbers are really close -- needed
+    // when comparing numbers near zero.
+    float diff = fabsf(A - B);
+    if (diff <= maxDiff)
+        return EXIT_SUCCESS;
+
+    A = fabsf(A);
+    B = fabsf(B);
+    float largest = (B > A) ? B : A;
+
+    if (diff <= largest * maxRelDiff)
+        return EXIT_SUCCESS;
+    
+    return EXIT_FAILURE;
+}
+
+int AlmostEqualRelativeAndAbs_double(double A, double B,
+                                     const double maxDiff,
+                                     const double maxRelDiff)
+{
+    // Check if the numbers are really close -- needed
+    // when comparing numbers near zero.
+    double diff = fabs(A - B);
+    if (diff <= maxDiff)
+        return EXIT_SUCCESS;
+
+    A = fabs(A);
+    B = fabs(B);
+    double largest = (B > A) ? B : A;
+
+    if (diff <= largest * maxRelDiff)
+        return EXIT_SUCCESS;
+
+    /* fprintf(stderr,"diff = %e largest * maxRelDiff = %e\n", diff, largest * maxRelDiff); */
+    return EXIT_FAILURE;
+}
 
 /* #undef __USE_XOPEN2K */

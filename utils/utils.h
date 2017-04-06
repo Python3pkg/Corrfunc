@@ -11,130 +11,62 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdint.h>//defines int64_t datatype -> *exactly* 8 bytes int
-#include<inttypes.h>//defines PRId64 for printing int64_t + includes stdint.h
-#include<math.h>
-#include<string.h>
-#include<limits.h>
-#include<time.h>
+#include <time.h>
 #include<sys/time.h>
-#include<stdarg.h>
+#include<sys/times.h>
+#include <sys/types.h>
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
-     //Just to output some colors
-    
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_YELLOW  "\x1b[33m"
-#define ANSI_COLOR_CYAN    "\x1b[36m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
+//routines for file i/o
+extern FILE * my_fopen(const char *fname,const char *mode);
+extern FILE * my_fopen_carefully(const char *fname,void (*header)(FILE *));
+extern size_t my_fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern size_t my_fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern int my_fseek(FILE *stream, long offset, int whence);
 
-#ifdef NDEBUG
-#define XASSERT(EXP, ...)                                do{} while(0)
-#else
-#define XASSERT(EXP, ...)                                               \
-     do { if (!(EXP)) {                                                 \
-             fprintf(stderr,"Error in file: %s\tfunc: %s\tline: %d with expression `"#EXP"'\n", __FILE__, __FUNCTION__, __LINE__); \
-             fprintf(stderr,__VA_ARGS__);                               \
-             fprintf(stderr,ANSI_COLOR_BLUE "Hopefully, input validation. Otherwise, bug in code: please email Manodeep Sinha <manodeep@gmail.com>"ANSI_COLOR_RESET"\n"); \
-             return EXIT_FAILURE;                                       \
-         }                                                              \
-     } while (0)
-#endif
+//general utilities
+extern void get_max_float(const int64_t ND1, const float *cz1, float *czmax);
+extern void get_max_double(const int64_t ND1, const double *cz1, double *czmax);
+extern char *int2bin(int a, char *buffer, int buf_size) ;
+extern int my_snprintf(char *buffer,int len,const char *format, ...) __attribute__((format(printf,3,4)));
+extern char * get_time_string(struct timeval t0,struct timeval t1);
+extern void print_time(struct timeval t0,struct timeval t1,const char *s);
+extern void current_utc_time(struct timespec *ts);
+extern int64_t getnumlines(const char *fname,const char comment);
+extern int is_big_endian(void);
+extern void byte_swap(char * const in, const size_t size, char *out);
 
-#ifdef NDEBUG
-#define XPRINT(EXP, ...)                                do{} while(0)
-#else
-#define XPRINT(EXP, ...)                                               \
-     do { if (!(EXP)) {                                                 \
-             fprintf(stderr,"Error in file: %s\tfunc: %s\tline: %d with expression `"#EXP"'\n", __FILE__, __FUNCTION__, __LINE__); \
-             fprintf(stderr,__VA_ARGS__);                               \
-             fprintf(stderr,ANSI_COLOR_BLUE "Hopefully, input validation. Otherwise, bug in code: please email Manodeep Sinha <manodeep@gmail.com>"ANSI_COLOR_RESET"\n"); \
-         }                                                              \
-     } while (0)
-#endif
+//memory routines
+extern void* my_realloc(void *x,size_t size,int64_t N,const char *varname);
+extern void* my_realloc_in_function(void **x,size_t size,int64_t N,const char *varname);
+extern void* my_malloc(size_t size,int64_t N);
+extern void* my_calloc(size_t size,int64_t N);
+extern void my_free(void ** x);
+extern void **matrix_malloc(size_t size,int64_t nx,int64_t ny);
+extern void **matrix_calloc(size_t size,int64_t nx,int64_t ny);
+extern int matrix_realloc(void **matrix, size_t size, int64_t nrow, int64_t ncol);
+extern void matrix_free(void **m,int64_t ny);
 
+void *** volume_malloc(size_t size,int64_t nrow,int64_t ncol,int64_t nframe);
+void *** volume_calloc(size_t size,int64_t nrow,int64_t ncol,int64_t nframe);
+void volume_free(void ***v,int64_t nrow,int64_t ncol);
 
-#ifdef NDEBUG
-#define XRETURN(EXP, VAL, ...)                                do{} while(0)
-#else
-#define XRETURN(EXP, VAL, ...)                                           \
-     do { if (!(EXP)) {                                                 \
-             fprintf(stderr,"Error in file: %s\tfunc: %s\tline: %d with expression `"#EXP"'\n", __FILE__, __FUNCTION__, __LINE__); \
-             fprintf(stderr,__VA_ARGS__);                               \
-             fprintf(stderr,ANSI_COLOR_BLUE "Hopefully, input validation. Otherwise, bug in code: please email Manodeep Sinha <manodeep@gmail.com>"ANSI_COLOR_RESET"\n"); \
-             return VAL;                                                \
-         }                                                              \
-     } while (0)
-#endif
-   
-#define SETUP_INTERRUPT_HANDLERS(handler_name)                          \
-     const int interrupt_signals[] = {SIGTERM, SIGINT, SIGHUP};         \
-     const size_t nsig = sizeof(interrupt_signals)/sizeof(interrupt_signals[0]); \
-     typedef void (* sig_handlers)(int);                                \
-     sig_handlers previous_handlers[nsig];                              \
-     for(size_t i=0;i<nsig;i++) {                                       \
-         int signo = interrupt_signals[i];                              \
-         sig_handlers prev = signal(signo, handler_name);               \
-         if (prev == SIG_ERR) {                                         \
-             fprintf(stderr,"Can not handle signal = %d\n", signo);     \
-         }                                                              \
-         previous_handlers[i] = prev;                                   \
-     }                                                              
+extern int run_system_call(const char *execstring);
 
-#define RESET_INTERRUPT_HANDLERS()              \
-     for(size_t i=0;i<nsig;i++) {                                       \
-         int signo = interrupt_signals[i];                              \
-         sig_handlers prev = previous_handlers[i];                      \
-         if(prev == SIG_IGN || prev == SIG_ERR) continue;               \
-         if(signal(signo, prev) == SIG_ERR) {                           \
-             fprintf(stderr,"Could not reset signal handler to default for signal = %d\n", signo); \
-         }                                                              \
-     }
-     
-    
-     //routines for file i/o
-     extern FILE * my_fopen(const char *fname,const char *mode);
-     extern FILE * my_fopen_carefully(const char *fname,void (*header)(FILE *));
-     extern size_t my_fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream);
-     extern size_t my_fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
-     extern int my_fseek(FILE *stream, long offset, int whence);
+extern int setup_bins(const char *fname,double *rmin,double *rmax,int *nbin,double **rupp);
+extern int setup_bins_double(const char *fname,double *rmin,double *rmax,int *nbin,double **rupp);
+extern int setup_bins_float(const char *fname,float *rmin,float *rmax,int *nbin,float **rupp);
 
-     //general utilities
-     extern char *int2bin(int a, char *buffer, int buf_size) ;
-     extern int my_snprintf(char *buffer,int len,const char *format, ...) __attribute__((format(printf,3,4)));
-     extern char * get_time_string(struct timeval t0,struct timeval t1);
-     extern void print_time(struct timeval t0,struct timeval t1,const char *s);
-     extern int64_t getnumlines(const char *fname,const char comment);
-     extern int is_big_endian(void);
-     extern void byte_swap(char * const in, const size_t size, char *out);
+extern int test_all_files_present(const int nfiles, ...);
 
-     //memory routines
-     extern void* my_realloc(void *x,size_t size,int64_t N,const char *varname);
-     extern void* my_realloc_in_function(void **x,size_t size,int64_t N,const char *varname);
-     extern void* my_malloc(size_t size,int64_t N);
-     extern  void* my_calloc(size_t size,int64_t N);
-     extern void my_free(void ** x);
-     extern void **matrix_malloc(size_t size,int64_t nx,int64_t ny);
-     extern void **matrix_calloc(size_t size,int64_t nx,int64_t ny);
-     extern void matrix_free(void **m,int64_t ny);
+/* Floating point comparison utilities */
+extern int AlmostEqualRelativeAndAbs_float(float A, float B, const float maxDiff, const float maxRelDiff);
+extern int AlmostEqualRelativeAndAbs_double(double A, double B, const double maxDiff, const double maxRelDiff);
 
-     void *** volume_malloc(size_t size,int64_t nrow,int64_t ncol,int64_t nframe);
-     void *** volume_calloc(size_t size,int64_t nrow,int64_t ncol,int64_t nframe);
-     void volume_free(void ***v,int64_t nrow,int64_t ncol);
-
-     extern int run_system_call(const char *execstring);
-
-     extern int setup_bins(const char *fname,double *rmin,double *rmax,int *nbin,double **rupp);
-     extern int setup_bins_double(const char *fname,double *rmin,double *rmax,int *nbin,double **rupp);
-     extern int setup_bins_float(const char *fname,float *rmin,float *rmax,int *nbin,float **rupp);
-
-     extern int test_all_files_present(const int nfiles, ...);
-     //end function declarations
+//end function declarations
 
 #ifdef __cplusplus
  }
