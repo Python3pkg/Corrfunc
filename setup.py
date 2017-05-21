@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
-from __future__ import print_function
+
 
 import os
 from os.path import join as pjoin, dirname, abspath, commonprefix
@@ -11,7 +11,7 @@ import re
 import subprocess
 
 if sys.version_info[0] < 3:
-        import __builtin__ as builtins
+        import builtins as builtins
 else:
     import builtins
 

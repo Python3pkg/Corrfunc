@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function, division
+
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ except ImportError:
     pd = None
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
         

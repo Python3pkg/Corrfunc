@@ -7,7 +7,7 @@ Author: Manodeep Sinha <manodeep@gmail.com>
 Requires: numpy
 
 """
-from __future__ import print_function
+
 from os.path import dirname, abspath, join as pjoin
 import time
 import numpy as np

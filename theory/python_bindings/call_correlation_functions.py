@@ -172,7 +172,7 @@ def read_catalog(filebase=None):
                 x, y, z = f(filename + e, dtype)
                 return x, y, z
         raise IOError("Could not locate {0} with any of these extensions \
-        = {1}".format(filename, allowed_exts.keys()))
+        = {1}".format(filename, list(allowed_exts.keys())))
     else:
         # Likely an user-supplied value
         if exists(filebase):

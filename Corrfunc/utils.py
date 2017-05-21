@@ -20,7 +20,7 @@ except NameError:
     xrange = range
 
 try:
-    long
+    int
 except NameError:
     long = int
     
@@ -347,7 +347,7 @@ def return_file_with_rbins(rbins):
     is_string = False
     delete_after_use = False
     try:
-        if isinstance(rbins, basestring):
+        if isinstance(rbins, str):
             is_string = True
     except NameError:
         if isinstance(rbins, str):
@@ -485,7 +485,7 @@ def translate_isa_string_to_enum(isa):
     msg = "Input to translate_isa_string_to_enum must be "\
           "of string type. Found type = {0}".format(type(isa))
     try:
-        if not isinstance(isa, basestring):
+        if not isinstance(isa, str):
             raise TypeError(msg)
     except NameError:
         if not isinstance(isa, str):
@@ -513,7 +513,7 @@ def translate_isa_string_to_enum(isa):
         return enums[isa_upper]
     except KeyError:
         print("Do not know instruction type = {0}".format(isa))
-        print("Valid instructions are {0}".format(enums.keys()))
+        print("Valid instructions are {0}".format(list(enums.keys())))
         raise
 
 
@@ -582,7 +582,7 @@ def compute_nbins(max_diff, binsize,
         raise ValueError(msg)
 
     # At least 1 bin
-    ngrid = max(1, long(max_diff/binsize))
+    ngrid = max(1, int(max_diff/binsize))
 
     # Then refine
     ngrid *= refine_factor
@@ -811,7 +811,7 @@ def gridlink_sphere(thetamax,
     num_ra_cells[:] = ra_refine_factor
     # xrange is replaced by range for python3
     # by using a try/except at the top
-    for idec in xrange(ngrid_dec):
+    for idec in range(ngrid_dec):
         dec_min = dec_limits[0] + idec*dec_binsize
         dec_max = dec_min + dec_binsize
 
@@ -837,7 +837,7 @@ def gridlink_sphere(thetamax,
     ra_binsizes = ra_diff/num_ra_cells
 
     start = 0
-    for idec in xrange(ngrid_dec):
+    for idec in range(ngrid_dec):
         assert start + num_ra_cells[idec] <= totncells
         source_sel = np.s_[start:start+num_ra_cells[idec]]
         for ira, r in enumerate(sphere_grid[source_sel]):

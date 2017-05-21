@@ -77,12 +77,12 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Corrfunc'
+project = 'Corrfunc'
 __import__(project)
 package = sys.modules[project]
 author = package.__author__
 current_year = date.today().year
-copyright = u'2014-{0}, {1}'.format(current_year, author)
+copyright = '2014-{0}, {1}'.format(current_year, author)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -259,7 +259,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [(master_doc, project + '.tex', project + u' Documentation',
+latex_documents = [(master_doc, project + '.tex', project + ' Documentation',
                     author, 'manual')]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -287,7 +287,7 @@ latex_documents = [(master_doc, project + '.tex', project + u' Documentation',
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, project.lower(), project + u' Documentation',
+man_pages = [(master_doc, project.lower(), project + ' Documentation',
               [author], 1)]
 
 # If true, show URL addresses after external links.
@@ -300,7 +300,7 @@ man_pages = [(master_doc, project.lower(), project + u' Documentation',
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Corrfunc', u'Corrfunc Documentation',
+    (master_doc, 'Corrfunc', 'Corrfunc Documentation',
      author, 'Corrfunc', 'One line description of project.',
      'Miscellaneous'),
 ]

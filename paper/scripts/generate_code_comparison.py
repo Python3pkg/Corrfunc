@@ -282,15 +282,15 @@ def test_from_registry(reg, rmin=1, rmax=90., nbin=19, nthreads=max_threads, nre
     func_runtimes['all_np'] = all_np
     
     for i,numpart in enumerate(all_np):
-        print('\tTesting with {} particles'.format(numpart))
+        print(('\tTesting with {} particles'.format(numpart)))
         # generate the random subsample
         points = points.reshape(-1).view(dtype=[('x',dtype,3)])
         subsample = np.random.choice(points, numpart, replace=False)
         subsample = subsample.view(dtype=dtype).reshape(-1,3)
         
-        for name,func in reg.iteritems():
-            print('\t\t{}'.format(name))
-            for j in xrange(nrepeat):
+        for name,func in reg.items():
+            print(('\t\t{}'.format(name)))
+            for j in range(nrepeat):
                 # Do the timing
                 rt = func(subsample, bins, **nthreads_kwarg)
                 func_runtimes[name][i,j] = rt
@@ -331,11 +331,11 @@ def plot_results(timings_fn):
     ax.set_xscale('log')
     ax.set_yscale('log')
     
-    for func,(runtimes,props) in func_runtimes.iteritems():
+    for func,(runtimes,props) in func_runtimes.items():
         means = runtimes.mean(axis=-2)
         ax.plot(all_np, means[:,1]/means[:,0], marker='', label=func, **props)
         #ax.plot(all_np, means[:,0],label=func, marker='o', **next(prop_cycle))
-        print(r'{}: {:.1f} -- {:.1f}\times'.format(func, (means[:,1]/means[:,0]).min(), (means[:,1]/means[:,0]).max()))
+        print((r'{}: {:.1f} -- {:.1f}\times'.format(func, (means[:,1]/means[:,0]).min(), (means[:,1]/means[:,0]).max())))
     ax.axhline(1., linestyle=':', c='k')
     if parallel:
         ax.legend(loc='upper left')
